@@ -21,6 +21,24 @@
 
 ---
 
+### 4. audit-secondbrain — 審計第二大腦（Obsidian + Claude Code 知識管理系統）
+
+建置審計專屬的 AI 第二大腦，自動批次轉換查核文件、生成調查計畫與工作底稿。
+
+| 功能 | 說明 |
+|------|------|
+| 批次轉換 | docx/xlsx/pdf/圖片 → markdown，自動分類歸檔 |
+| 調查計畫生成 | 含相關法規及連結（自動 PCode 查詢）、調閱資料清單、缺失評估問卷 |
+| 工作底稿生成 | 四階段標準化結構（標題、依據、查核事實、擬議處理意見） |
+| 知識重整 | 每週自動執行 Karpathy 式七步驟知識重整 |
+| 法規查詢 | get_pcode.py 自動查詢全國法規資料庫 PCode |
+
+**如何使用**：在 opencode 中說「第二大腦」「審計第二大腦」「audit-secondbrain」
+
+**完整指南**：`skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`（1286 行，15 階段完整操作步驟，可直接餵給 Claude Code 執行）
+
+---
+
 ### 2. fjudsearch — 司法院裁判書系統（FJUD）判決查詢
 
 查詢司法院各級法院裁判書，追蹤廠商/個人涉訟紀錄與法律見解。
@@ -70,7 +88,8 @@
   "skill": {
     "pccsearch": "allow",
     "fjudsearch": "allow",
-    "lvrlandmoigov": "allow"
+    "lvrlandmoigov": "allow",
+    "audit-secondbrain": "allow"
   }
 }
 ```
