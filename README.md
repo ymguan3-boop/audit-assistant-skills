@@ -2,6 +2,19 @@
 
 審計輔助應用技能倉庫 — 提供 opencode 技能，輔助審計人員快速查詢政府開放資料及不動產交易資訊。
 
+## 技能一覽
+
+| 圖示 | 技能 | 用途 |
+|------|------|------|
+| 🔍 | pccsearch | 政府電子採購網標案查詢 |
+| ⚖️ | fjudsearch | 司法院裁判書判決查詢 |
+| 🏠 | lvrlandmoigov | 內政部不動產實價登錄查詢 |
+| 🏗️ | pcic-export | 公共工程雲端服務網標案資料匯出（支援 `--yilan` 全額度匯出） |
+| 🗺️ | qgisskill | QGIS 地圖自動化（宜蘭縣地理資訊系統） |
+| 🧠 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
+
+---
+
 ## 技能列表
 
 ### 1. pccsearch — 政府電子採購網（PCC）標案查詢
@@ -18,55 +31,6 @@
 **如何使用**：在 opencode 中說「搜標案」「查標案」「pccsearch」
 
 **串接平台**：開放政府標案(pcc.mlwmlw.org)、台灣標案網(bid.twincn.com)、BidAcumen
-
----
-
-### 5. qgisskill — QGIS 地圖自動化（宜蘭縣地理資訊系統）
-
-自動建立 QGIS 專案，載入宜蘭縣界、鄉鎮市界線、OpenStreetMap 底圖與地址點位分析。
-
-| 功能 | 說明 |
-|------|------|
-| 地理資料下載 | 從 g0v/twgeojson 下載台灣縣市及鄉鎮市界線，篩選宜蘭縣 |
-| QGIS 專案建立 | 自動建立含 OpenStreetMap 底圖、縣界、鄉鎮市界線的 QGIS 專案 |
-| 圖層樣式設定 | 縣界黑色邊框1.5mm、鄉鎮市紅色邊框1.2mm，填色透明度70% |
-| 地址地理編碼 | 讀取 CSV/XLSX 地址資料，自動解析鄉鎮市、Nominatim 查詢座標、加入亂數位移避免重疊 |
-| 圖層疊合 | 支援瓦斯行、儲存場所等點位圖層，依類型分類著色 |
-
-**如何使用**：在 opencode 中說「qgisskill」「QGIS 技能」
-
-**參考資料**：`town_coords.json`（宜蘭縣12鄉鎮中心點座標）
-
----
-
-## 技能一覽
-
-| 圖示 | 技能 | 用途 |
-|------|------|------|
-| 🔍 | pccsearch | 政府電子採購網標案查詢 |
-| ⚖️ | fjudsearch | 司法院裁判書判決查詢 |
-| 🏠 | lvrlandmoigov | 內政部不動產實價登錄查詢 |
-| 🧠 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
-| 🗺️ | qgisskill | QGIS 地圖自動化（宜蘭縣地理資訊系統） |
-| 🏗️ | pcic-export | 公共工程雲端服務網標案資料匯出（支援 `--yilan` 全額度匯出） |
-
----
-
-### 4. audit-secondbrain — 審計第二大腦（Obsidian + Claude Code 知識管理系統）
-
-建置審計專屬的 AI 第二大腦，自動批次轉換查核文件、生成調查計畫與工作底稿。
-
-| 功能 | 說明 |
-|------|------|
-| 批次轉換 | docx/xlsx/pdf/圖片 → markdown，自動分類歸檔 |
-| 調查計畫生成 | 含相關法規及連結（自動 PCode 查詢）、調閱資料清單、缺失評估問卷 |
-| 工作底稿生成 | 四階段標準化結構（標題、依據、查核事實、擬議處理意見） |
-| 知識重整 | 每週自動執行 Karpathy 式七步驟知識重整 |
-| 法規查詢 | get_pcode.py 自動查詢全國法規資料庫 PCode |
-
-**如何使用**：在 opencode 中說「第二大腦」「審計第二大腦」「audit-secondbrain」
-
-**完整指南**：`skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`（1286 行，15 階段完整操作步驟，可直接餵給 Claude Code 執行）
 
 ---
 
@@ -104,7 +68,7 @@
 
 ---
 
-### 6. pcic-export — 公共工程雲端服務網（PCIC）標案資料匯出
+### 4. pcic-export — 公共工程雲端服務網（PCIC）標案資料匯出
 
 自動化操作 PCIC 機關端，匯出「標案自選欄位表」Excel 檔案，可作為資料庫使用。
 
@@ -131,6 +95,42 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 
 ---
 
+### 5. qgisskill — QGIS 地圖自動化（宜蘭縣地理資訊系統）
+
+自動建立 QGIS 專案，載入宜蘭縣界、鄉鎮市界線、OpenStreetMap 底圖與地址點位分析。
+
+| 功能 | 說明 |
+|------|------|
+| 地理資料下載 | 從 g0v/twgeojson 下載台灣縣市及鄉鎮市界線，篩選宜蘭縣 |
+| QGIS 專案建立 | 自動建立含 OpenStreetMap 底圖、縣界、鄉鎮市界線的 QGIS 專案 |
+| 圖層樣式設定 | 縣界黑色邊框1.5mm、鄉鎮市紅色邊框1.2mm，填色透明度70% |
+| 地址地理編碼 | 讀取 CSV/XLSX 地址資料，自動解析鄉鎮市、Nominatim 查詢座標、加入亂數位移避免重疊 |
+| 圖層疊合 | 支援瓦斯行、儲存場所等點位圖層，依類型分類著色 |
+
+**如何使用**：在 opencode 中說「qgisskill」「QGIS 技能」
+
+**參考資料**：`town_coords.json`（宜蘭縣12鄉鎮中心點座標）
+
+---
+
+### 6. audit-secondbrain — 審計第二大腦（Obsidian + Claude Code 知識管理系統）
+
+建置審計專屬的 AI 第二大腦，自動批次轉換查核文件、生成調查計畫與工作底稿。
+
+| 功能 | 說明 |
+|------|------|
+| 批次轉換 | docx/xlsx/pdf/圖片 → markdown，自動分類歸檔 |
+| 調查計畫生成 | 含相關法規及連結（自動 PCode 查詢）、調閱資料清單、缺失評估問卷 |
+| 工作底稿生成 | 四階段標準化結構（標題、依據、查核事實、擬議處理意見） |
+| 知識重整 | 每週自動執行 Karpathy 式七步驟知識重整 |
+| 法規查詢 | get_pcode.py 自動查詢全國法規資料庫 PCode |
+
+**如何使用**：在 opencode 中說「第二大腦」「審計第二大腦」「audit-secondbrain」
+
+**完整指南**：`skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`（1286 行，15 階段完整操作步驟，可直接餵給 Claude Code 執行）
+
+---
+
 ## 安裝方式
 
 將 skills 目錄下的技能複製至 opencode 設定目錄：
@@ -147,9 +147,9 @@ python run_export.py --export-dir DIR # 指定匯出目錄
     "pccsearch": "allow",
     "fjudsearch": "allow",
     "lvrlandmoigov": "allow",
-    "audit-secondbrain": "allow",
+    "pcic-export": "allow",
     "qgisskill": "allow",
-    "pcic-export": "allow"
+    "audit-secondbrain": "allow"
   }
 }
 ```
@@ -160,3 +160,4 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 - [內政部不動產交易實價查詢服務網](https://lvr.land.moi.gov.tw)
 - [政府電子採購網](https://web.pcc.gov.tw)
 - [司法院裁判書查詢](https://judgment.judicial.gov.tw)
+- [公共工程雲端服務網](https://pcic.pcc.gov.tw)
