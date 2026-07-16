@@ -48,7 +48,7 @@
 | 🏠 | lvrlandmoigov | 內政部不動產實價登錄查詢 |
 | 🧠 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
 | 🗺️ | qgisskill | QGIS 地圖自動化（宜蘭縣地理資訊系統） |
-| 🏗️ | pcic-export | 公共工程雲端服務網標案資料匯出 |
+| 🏗️ | pcic-export | 公共工程雲端服務網標案資料匯出（支援 `--yilan` 全額度匯出） |
 
 ---
 
@@ -106,16 +106,26 @@
 
 ### 6. pcic-export — 公共工程雲端服務網（PCIC）標案資料匯出
 
-自動化操作 PCIC 機關端，匯出「標案自選欄位表」Excel 檔案。
+自動化操作 PCIC 機關端，匯出「標案自選欄位表」Excel 檔案，可作為資料庫使用。
 
 | 功能 | 說明 |
 |------|------|
 | 自動導航 | 點擊「標案管理」→「報表查詢」→「標案自選欄位表」 |
+| 宜蘭縣全額度匯出 | `--yilan` 參數自動設定：機關=宜蘭縣政府、列印層級=含所屬機關、預算=0起 |
 | 預算篩選 | 自動將「發包預算」設為最小值（0萬元起） |
 | 查詢匯出 | 執行查詢後透過「匯出」下拉選單下載 EXCEL |
 | 檔案通訊 | 腳本與 AI 透過 `_status.txt` / `_cmd.txt` 檔案同步 |
 
-**如何使用**：在 opencode 中說「抓 PCIC」「匯出標案」「pcic-export」「公共工程」
+**便捷指令**：在 opencode 中說「匯出標案管理系統中宜蘭縣所屬機關的所有資料」
+
+**其他使用方式**：「抓 PCIC」「匯出標案」「pcic-export」「公共工程」
+
+**命令列**：
+```bash
+python run_export.py --yilan          # 宜蘭縣全額度匯出（推薦）
+python run_export.py                  # 預設模式
+python run_export.py --export-dir DIR # 指定匯出目錄
+```
 
 **資料來源**：公共工程雲端服務網（pcic.pcc.gov.tw）
 
