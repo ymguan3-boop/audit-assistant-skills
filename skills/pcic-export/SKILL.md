@@ -43,7 +43,9 @@ AI 會自動：
 ### 方法二：直接執行腳本
 
 ```bash
-python skills/pcic-export/run_export.py --export-dir ./exports
+python skills/pcic-export/run_export.py --yilan          # 宜蘭縣全額度匯出（推薦）
+python skills/pcic-export/run_export.py                  # 預設模式
+python skills/pcic-export/run_export.py --export-dir DIR # 指定匯出目錄
 ```
 
 腳本會：
@@ -84,6 +86,7 @@ pcic_downloader/
 
 ## 重要設定
 
+- **--yilan 模式**：自動設定機關=宜蘭縣政府、列印層級=含所屬機關、發包預算=0萬元起
 - **發包預算**：預設設為最小值（0萬元起），可修改腳本中的 select 邏輯調整
 - **機關**：預設為「宜蘭縣政府」，可修改腳本中的機關 select
 - **URL**：`https://pcic.pcc.gov.tw/pwc-web/service/bidAta001`
