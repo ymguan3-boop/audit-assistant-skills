@@ -4,7 +4,9 @@ PCIC 標案資料匯出腳本
 自動導航至「標案自選欄位表」，設定條件後匯出 Excel。
 
 使用方式：
-    python run_export.py [--export-dir DIR]
+    python run_export.py                          # 預設模式
+    python run_export.py --yilan                  # 宜蘭縣全額度匯出（含所屬機關、預算0起）
+    python run_export.py --export-dir DIR         # 指定匯出目錄
 
 依賴：
     pip install playwright
@@ -19,10 +21,77 @@ from playwright.sync_api import sync_playwright
 URL = 'https://pcic.pcc.gov.tw/pwc-web/service/bidAta001'
 
 
+def set_yilan_full_export(page, log):
+    """設定宜蘭縣全額度匯出條件：列印層級=含所屬機關、預算=0起"""
+    log('  [宜蘭模式] 設定列印層級=含所屬機關')
+    try:
+        page.evaluate('''() => {
+            // 找「列印層級」的 radio button，選「含所屬機關」
+            const radios = document.querySelectorAll('input[type="radio"]');
+            for (const r of radios) {
+                const label = r.closest('label') || document.querySelector(`label[for="${r.id}"]`);
+                const text = label ? label.textContent : r.value;
+                if (text.includes('含所屬機關') || r.value.includes('含所屬')) {
+                    r.click();
+                    r.dispatchEvent(new Event('change', {bubbles: true}));
+                    return '已選含所屬機關';
+                }
+            }
+            return '未找到含所屬機關';
+        }''')
+        log('  [宜蘭模式] 列印層級已設定')
+    except Exception as e:
+        log(f'  [宜蘭模式] 列印層級設定失敗: {str(e)[:50]}')
+
+    log('  [宜蘭模式] 設定預算=0起')
+    try:
+        page.evaluate('''() => {
+            const sels = document.querySelectorAll('select');
+            for (let i = 0; i < sels.length; i++) {
+                const opts = Array.from(sels[i].options);
+                const hasBudget = opts.some(o => o.text.includes('萬') || o.text.includes('億'));
+                if (hasBudget) {
+                    let minOpt = opts[0];
+                    for (const o of opts) {
+                        if (!isNaN(parseInt(o.value)) && parseInt(o.value) < parseInt(minOpt.value)) minOpt = o;
+                    }
+                    sels[i].value = minOpt.value;
+                    sels[i].dispatchEvent(new Event('change', {bubbles: true}));
+                    return `設定select[${i}] 為 ${minOpt.text}`;
+                }
+            }
+            return '未找到';
+        }''')
+        log('  [宜蘭模式] 預算已設定為最小值')
+    except Exception as e:
+        log(f'  [宜蘭模式] 預算設定失敗: {str(e)[:50]}')
+
+    log('  [宜蘭模式] 設定機關=宜蘭縣政府')
+    try:
+        page.evaluate('''() => {
+            const sels = document.querySelectorAll('select');
+            for (const s of sels) {
+                const opts = Array.from(s.options);
+                const yilan = opts.find(o => o.text.includes('宜蘭縣'));
+                if (yilan) {
+                    s.value = yilan.value;
+                    s.dispatchEvent(new Event('change', {bubbles: true}));
+                    return `機關設為: ${yilan.text}`;
+                }
+            }
+            return '未找到宜蘭縣';
+        }''')
+        log('  [宜蘭模式] 機關已設定為宜蘭縣政府')
+    except Exception as e:
+        log(f'  [宜蘭模式] 機關設定失敗: {str(e)[:50]}')
+
+
 def main():
     parser = argparse.ArgumentParser(description='PCIC 標案資料匯出')
     parser.add_argument('--export-dir', type=str, default=None,
                         help='匯出目錄（預設: 腳本同層 exports/）')
+    parser.add_argument('--yilan', action='store_true',
+                        help='宜蘭縣全額度匯出模式（含所屬機關、預算0起）')
     args = parser.parse_args()
 
     BASE = Path(__file__).parent.parent
@@ -111,67 +180,71 @@ def main():
             except: pass
         ss(page, '04_selfields')
 
-        # 步驟4: 設定發包預算為最小值
-        log('步驟4: 設定預算為最小值')
-        all_selects = page.evaluate('''() => {
-            const sels = document.querySelectorAll('select');
-            return Array.from(sels).map((s, i) => ({
-                idx: i,
-                id: s.id || '',
-                name: s.name || '',
-                visible: s.offsetParent !== null,
-                allOpts: Array.from(s.options).slice(0,5).map(o => o.text + '=' + o.value)
-            }));
-        }''')
-        log(f'  所有select: {all_selects}')
-        budget_set = False
-        for s in all_selects:
-            if not s['visible']:
-                continue
-            sid = (s['id'] + s['name']).lower()
-            opts_text = ' '.join(s['allOpts']).lower()
-            if any(k in sid for k in ['budget', 'amount', '預算', '發包']) or \
-               any(k in opts_text for k in ['萬', '億']):
-                log(f'  找到預算select idx={s["idx"]} id={s["id"]} opts={s["allOpts"]}')
-                try:
-                    page.evaluate(f'''() => {{
-                        const sel = document.querySelectorAll('select')[{s['idx']}];
-                        const opts = Array.from(sel.options);
-                        let minOpt = opts[0];
-                        for (const o of opts) {{
-                            if (!isNaN(parseInt(o.value)) && parseInt(o.value) < parseInt(minOpt.value)) minOpt = o;
-                        }}
-                        sel.value = minOpt.value;
-                        sel.dispatchEvent(new Event('change', {{bubbles: true}}));
-                    }}''')
-                    log(f'  已設定預算為最小值')
-                    budget_set = True
-                    break
-                except Exception as e:
-                    log(f'  設定失敗: {str(e)[:50]}')
-        if not budget_set:
-            log('  未找到預算select，嘗試用含「萬/億」option 的 select')
-            try:
-                page.evaluate('''() => {
-                    const sels = document.querySelectorAll('select');
-                    for (let i = 0; i < sels.length; i++) {
-                        const opts = Array.from(sels[i].options);
-                        const hasBudget = opts.some(o => o.text.includes('萬') || o.text.includes('億'));
-                        if (hasBudget) {
+        # 步驟4: 設定篩選條件
+        if args.yilan:
+            log('步驟4: [宜蘭模式] 設定全額度匯出條件')
+            set_yilan_full_export(page, log)
+        else:
+            log('步驟4: 設定預算為最小值')
+            all_selects = page.evaluate('''() => {
+                const sels = document.querySelectorAll('select');
+                return Array.from(sels).map((s, i) => ({
+                    idx: i,
+                    id: s.id || '',
+                    name: s.name || '',
+                    visible: s.offsetParent !== null,
+                    allOpts: Array.from(s.options).slice(0,5).map(o => o.text + '=' + o.value)
+                }));
+            }''')
+            log(f'  所有select: {all_selects}')
+            budget_set = False
+            for s in all_selects:
+                if not s['visible']:
+                    continue
+                sid = (s['id'] + s['name']).lower()
+                opts_text = ' '.join(s['allOpts']).lower()
+                if any(k in sid for k in ['budget', 'amount', '預算', '發包']) or \
+                   any(k in opts_text for k in ['萬', '億']):
+                    log(f'  找到預算select idx={s["idx"]} id={s["id"]} opts={s["allOpts"]}')
+                    try:
+                        page.evaluate(f'''() => {{
+                            const sel = document.querySelectorAll('select')[{s['idx']}];
+                            const opts = Array.from(sel.options);
                             let minOpt = opts[0];
-                            for (const o of opts) {
+                            for (const o of opts) {{
                                 if (!isNaN(parseInt(o.value)) && parseInt(o.value) < parseInt(minOpt.value)) minOpt = o;
+                            }}
+                            sel.value = minOpt.value;
+                            sel.dispatchEvent(new Event('change', {{bubbles: true}}));
+                        }}''')
+                        log(f'  已設定預算為最小值')
+                        budget_set = True
+                        break
+                    except Exception as e:
+                        log(f'  設定失敗: {str(e)[:50]}')
+            if not budget_set:
+                log('  未找到預算select，嘗試用含「萬/億」option 的 select')
+                try:
+                    page.evaluate('''() => {
+                        const sels = document.querySelectorAll('select');
+                        for (let i = 0; i < sels.length; i++) {
+                            const opts = Array.from(sels[i].options);
+                            const hasBudget = opts.some(o => o.text.includes('萬') || o.text.includes('億'));
+                            if (hasBudget) {
+                                let minOpt = opts[0];
+                                for (const o of opts) {
+                                    if (!isNaN(parseInt(o.value)) && parseInt(o.value) < parseInt(minOpt.value)) minOpt = o;
+                                }
+                                sels[i].value = minOpt.value;
+                                sels[i].dispatchEvent(new Event('change', {bubbles: true}));
+                                return `設定select[${i}] 為 ${minOpt.text}`;
                             }
-                            sels[i].value = minOpt.value;
-                            sels[i].dispatchEvent(new Event('change', {bubbles: true}));
-                            return `設定select[${i}] 為 ${minOpt.text}`;
                         }
-                    }
-                    return '未找到';
-                }''')
-                log(f'  index方式: 已嘗試')
-            except Exception as e:
-                log(f'  index方式失敗: {str(e)[:50]}')
+                        return '未找到';
+                    }''')
+                    log(f'  index方式: 已嘗試')
+                except Exception as e:
+                    log(f'  index方式失敗: {str(e)[:50]}')
         ss(page, '05_filled')
 
         # 步驟5: 執行查詢
