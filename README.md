@@ -12,6 +12,7 @@
 | 🏗️ | pcic-export | 公共工程雲端服務網標案資料匯出（支援 `--yilan` 全額度匯出） |
 | 🗺️ | qgisskill | QGIS 地圖自動化（宜蘭縣地理資訊系統） |
 | 🧠 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
+| 📋 | ezbid-bidders | ezbid.tw 投標廠商資料抓取（各標案投標廠商列表） |
 
 ---
 
@@ -131,6 +132,31 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 
 ---
 
+### 7. ezbid-bidders — ezbid.tw 投標廠商資料抓取
+
+從台灣政府採購與標案情報站（ezbid.tw）抓取各標案的投標廠商列表，解析廠商名稱、是否得標、投標金額與價差。
+
+| 功能 | 說明 |
+|------|------|
+| 投標廠商抓取 | 從 ezbid.tw 逐一訪問標案頁面，解析完整投標廠商列表 |
+| 得標分析 | 記錄各廠商是否得標、投標金額、與底價/預算價差 |
+| 批次抓取 | 支援全量抓取或限制筆數（`--limit`）、測試模式（`--test`） |
+| 本地資料庫 | 資料存入 SQLite，可直接 SQL 查詢特定標案或廠商投標紀錄 |
+
+**如何使用**：在 opencode 中說「抓投標廠商」「投標廠商資料」「ezbid-bidders」
+
+**資料來源**：ezbid.tw（台灣政府採購與標案情報站），資料源自政府電子採購網（PCC），每日更新三次
+
+**命令列**：
+```bash
+python fetch_bidders.py              # 抓取所有標案
+python fetch_bidders.py --limit 10   # 僅抓取前10筆
+python fetch_bidders.py --test       # 測試模式（僅抓取1筆）
+python fetch_bidders.py --db PATH    # 指定資料庫路徑
+```
+
+---
+
 ## 安裝方式
 
 將 skills 目錄下的技能複製至 opencode 設定目錄：
@@ -149,7 +175,8 @@ python run_export.py --export-dir DIR # 指定匯出目錄
     "lvrlandmoigov": "allow",
     "pcic-export": "allow",
     "qgisskill": "allow",
-    "audit-secondbrain": "allow"
+    "audit-secondbrain": "allow",
+    "ezbid-bidders": "allow"
   }
 }
 ```
@@ -161,3 +188,4 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 - [政府電子採購網](https://web.pcc.gov.tw)
 - [司法院裁判書查詢](https://judgment.judicial.gov.tw)
 - [公共工程雲端服務網](https://pcic.pcc.gov.tw)
+- [台灣政府採購與標案情報站](https://ezbid.tw)
