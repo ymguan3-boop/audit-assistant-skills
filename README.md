@@ -131,6 +131,8 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 
 **完整指南**：`skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`（1286 行，15 階段完整操作步驟，可直接餵給 Claude Code 執行）
 
+**開工收工初始化**：`skills/audit-secondbrain/審計第二大腦開工收工初始化技能.md` — 每日開工/收工自動同步 Obsidian 第二知識大腦，含 Git 自動提交、OCR 轉換、MCP Vault 批次查詢與筆記索引更新
+
 ---
 
 ### 7. ezbid-bidders — ezbid.tw 投標廠商資料抓取
