@@ -13,6 +13,7 @@
 | 🗺️ | qgisskill | QGIS 地圖自動化（宜蘭縣地理資訊系統） |
 | 🧠 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
 | 📋 | ezbid-bidders | ezbid.tw 投標廠商資料抓取（各標案投標廠商列表） |
+| 📝 | audit-report-builder | 審計機關聯合稽察調查報告彙整（從調查計畫與工作底稿自動產出 Word 報告） |
 
 ---
 
@@ -157,6 +158,28 @@ python fetch_bidders.py --db PATH    # 指定資料庫路徑
 
 ---
 
+### 8. audit-report-builder — 審計機關聯合稽察調查報告彙整
+
+依審計機關聯合稽察調查報告格式，從調查計畫與工作底稿自動產出彙整報告。
+
+| 功能 | 說明 |
+|------|------|
+| 格式自動化 | 依審計報告格式（壹~玖章），自動設定縮排、粗體、標楷體 16pt |
+| 多來源合併 | 支援 1 份調查計畫 + 多份工作底稿，合併為完整報告 |
+| 章節結構 | 查核緣起→查核依據→查核範圍→查核限制→查核重點→查核事實→查核意見→擬議處理意見→附錄 |
+| 表格處理 | 自動帶入報告模板，調整表格標題與內文字型大小 |
+
+**如何使用**：在 opencode 中說「彙整調查報告」「做報告」「audit-report」
+
+**命令列**：
+```powershell
+python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --workpapers "底稿2.docx" --output "報告.docx"
+```
+
+**依賴**：Python 3.10+、python-docx、pywin32（僅 .doc 格式需要）
+
+---
+
 ## 補充說明：為何 pccsearch 與 ezbid-bidders 不需登入即可爬取資料？
 
 這兩個技能**繞過**了政府官方網站的反爬機制，但並非透過破解登入，而是利用第三方平台早已公開的彙整資料。以下詳細說明其原理與使用情境。
@@ -289,7 +312,8 @@ fetch_bidders.py 執行
     "pcic-export": "allow",
     "qgisskill": "allow",
     "audit-secondbrain": "allow",
-    "ezbid-bidders": "allow"
+    "ezbid-bidders": "allow",
+    "audit-report-builder": "allow"
   }
 }
 ```
