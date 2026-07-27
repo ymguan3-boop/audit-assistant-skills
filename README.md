@@ -16,6 +16,7 @@
 | 📝 | audit-report-builder | 審計機關聯合稽察調查報告彙整（從調查計畫與工作底稿自動產出 Word 報告） |
 | 📡 | gov-intelligence | 政府地方情資分析（每日主動巡查行政區域重要資訊，分析事件發展，辨識風險） |
 | 📰 | audit-info-publish | 重要政府審計資訊撰寫（分析主題資料、搜尋官網類似案例、依格式撰寫發布稿） |
+| ⚖️ | audit-judgment-draft | 採購申訴審議判斷書簽文撰寫（OCR判斷書PDF、自動產出審計機關簽辦公文） |
 
 ---
 
@@ -226,6 +227,31 @@ python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --
 
 ---
 
+### 11. audit-judgment-draft — 採購申訴審議判斷書簽文撰寫
+
+從採購申訴審議判斷書PDF自動OCR擷取內容，產出審計機關簽辦公文（MD格式，可直接複製貼入公文系統）。
+
+| 功能 | 說明 |
+|------|------|
+| PDF OCR | 自動辨識掃描版判斷書PDF，擷取全文內容 |
+| 關鍵資訊擷取 | 自動提取案號、當事人、判斷結果、判斷理由等 |
+| .di描述檔解析 | 讀取XML格式來文描述檔，精確取得來文字號、主旨等 |
+| 簽辦公文產出 | 依審計機關簽文格式自動產出（說明二~四、擬辦） |
+| 判斷結果對應 | 依申訴駁回/有理由/不受理等結果，自動調整擬辦方向 |
+
+**如何使用**：在 opencode 中說「寫判斷書簽」「申訴審議判斷書簽文」「judgment-draft」
+
+**簽文格式規範**：
+- 說明二：「旨案緣係……遂向工程會申訴。」
+- 說明三：「經據工程會檢送旨案採購申訴審議判斷書略以：……等情。」
+- 說明四：「另據……規定，……，擬函請……，並將……結果復知本室。」
+- 擬辦：依說明四所簽內容分條列述
+- 結語：「以上所擬，是否有當？敬請核示」
+
+**依賴**：Python 3.10+、pdf2image、pytesseract、Tesseract OCR（`C:\Program Files\Tesseract-OCR\tesseract.exe`）
+
+---
+
 ## 補充說明：為何 pccsearch 與 ezbid-bidders 不需登入即可爬取資料？
 
 這兩個技能**繞過**了政府官方網站的反爬機制，但並非透過破解登入，而是利用第三方平台早已公開的彙整資料。以下詳細說明其原理與使用情境。
@@ -361,7 +387,8 @@ fetch_bidders.py 執行
     "ezbid-bidders": "allow",
     "audit-report-builder": "allow",
     "gov-intelligence": "allow",
-    "audit-info-publish": "allow"
+    "audit-info-publish": "allow",
+    "audit-judgment-draft": "allow"
   }
 }
 ```
