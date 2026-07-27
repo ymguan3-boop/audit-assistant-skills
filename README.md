@@ -15,6 +15,7 @@
 | 📋 | ezbid-bidders | ezbid.tw 投標廠商資料抓取（各標案投標廠商列表） |
 | 📝 | audit-report-builder | 審計機關聯合稽察調查報告彙整（從調查計畫與工作底稿自動產出 Word 報告） |
 | 📡 | gov-intelligence | 政府地方情資分析（每日主動巡查行政區域重要資訊，分析事件發展，辨識風險） |
+| 📰 | audit-info-publish | 重要政府審計資訊撰寫（分析主題資料、搜尋官網類似案例、依格式撰寫發布稿） |
 
 ---
 
@@ -207,6 +208,24 @@ python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --
 
 ---
 
+### 10. audit-info-publish — 重要政府審計資訊撰寫
+
+依審計部官網「重要政府審計資訊」格式，自動撰寫正式發布稿。
+
+| 功能 | 說明 |
+|------|------|
+| 資料分析 | OCR 掃描檔轉文字、解析案件背景、查核發現、改善成果 |
+| 官網搜尋 | 前往審計部官網搜尋近2年類似案例，分析標題與內文格式 |
+| 稿件撰寫 | 四段式標準結構（摘要→背景→查核發現→改善成果） |
+| 格式規範 | 全形空格、機關簡稱、民國紀年、金額單位等用語自動統一 |
+| 稿件存檔 | 存至使用者指定路徑，同步至第二大腦 |
+
+**如何使用**：在 opencode 中說「寫審計資訊」「審計資訊發布」「重要政府審計資訊」「audit-info-publish」
+
+**參考網站**：審計部重要政府審計資訊列表（https://www.audit.gov.tw/p/412-1000-103.php?Lang=zh-tw）
+
+---
+
 ## 補充說明：為何 pccsearch 與 ezbid-bidders 不需登入即可爬取資料？
 
 這兩個技能**繞過**了政府官方網站的反爬機制，但並非透過破解登入，而是利用第三方平台早已公開的彙整資料。以下詳細說明其原理與使用情境。
@@ -341,7 +360,8 @@ fetch_bidders.py 執行
     "audit-secondbrain": "allow",
     "ezbid-bidders": "allow",
     "audit-report-builder": "allow",
-    "gov-intelligence": "allow"
+    "gov-intelligence": "allow",
+    "audit-info-publish": "allow"
   }
 }
 ```
