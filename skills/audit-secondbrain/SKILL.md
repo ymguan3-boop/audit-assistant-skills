@@ -1,6 +1,6 @@
 ---
 name: audit-secondbrain
-description: 審計第二大腦設定 — Obsidian + Claude Code + MCP Vault 知識管理系統。說「第二大腦」「審計第二大腦」「audit-secondbrain」「obsidian 設定」時載入
+description: 審計第二大腦設定 — Obsidian + OpenCode + MCP Vault 知識管理系統。說「第二大腦」「審計第二大腦」「audit-secondbrain」「obsidian 設定」時載入
 ---
 
 # 審計第二大腦設定指南
@@ -9,7 +9,7 @@ description: 審計第二大腦設定 — Obsidian + Claude Code + MCP Vault 知
 
 ## 什麼是審計第二大腦？
 
-一個基於 Obsidian + Claude Code + MCP Vault 的審計專屬 AI 知識管理系統，能自動：
+一個基於 Obsidian + OpenCode + MCP Vault 的審計專屬 AI 知識管理系統，能自動：
 
 - ✅ 批次轉換 docx/xlsx/pdf/圖片 → markdown
 - ✅ 自動分類查核報告、法規、查核意見
@@ -29,7 +29,7 @@ description: 審計第二大腦設定 — Obsidian + Claude Code + MCP Vault 知
 
 ## 先備條件
 
-- Claude Code 桌面版（Pro 方案以上）
+- OpenCode 桌面版（Pro 方案以上）
 - Node.js
 - Python 3.8+
 - Obsidian（知識庫筆記軟體）
@@ -42,7 +42,7 @@ description: 審計第二大腦設定 — Obsidian + Claude Code + MCP Vault 知
 | 一 | 環境檢查 | 自動檢查 Node.js、Pandoc、Tesseract OCR、Python 套件、Selenium |
 | 二 | 認識使用者 | 詢問職系、單位、語言偏好 |
 | 三 | 安裝 Obsidian + 建立 Vault | 建立三層資料夾結構 |
-| 四 | 連接 MCP | 安裝 mcpvault，讓 Claude Code 讀寫 Obsidian 筆記 |
+| 四 | 連接 MCP | 安裝 mcpvault，讓 OpenCode 讀寫 Obsidian 筆記 |
 | 五 | 建立 CLAUDE.md | 工作規則（分類規則、生成原則、批次轉換流程） |
 | 六 | 建立 Templates | 工作日誌、週計畫、知識庫頁面模板 |
 | 七 | 建立知識庫初始檔案 | index.md + log.md |
@@ -83,7 +83,7 @@ description: 審計第二大腦設定 — Obsidian + Claude Code + MCP Vault 知
 `skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`
 
 該文件包含：
-- 15 大階段完整操作指令（可直接餵給 Claude Code 執行）
+- 15 大階段完整操作指令（可直接餵給 OpenCode 執行）
 - 法規 PCode 查詢工具（get_pcode.py）完整程式碼
 - 批次轉換腳本架構與配置
 - 查核意見分類規則（四層結構）

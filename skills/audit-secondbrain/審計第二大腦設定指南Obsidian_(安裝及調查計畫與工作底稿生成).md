@@ -5,7 +5,7 @@ type: 懶人包
 version: v1.1
 status: 合併版（已修正）
 tags:
-  - Claude-Code
+  - OpenCode
   - 懶人包
   - Obsidian
   - 第二大腦
@@ -30,10 +30,10 @@ tags:
 幫你從零開始建置審計專屬的 AI 第二大腦系統，一次完成所有步驟：
 
 - ✅ 環境檢查與工具安裝（Node.js、Pandoc、Tesseract OCR、Python 轉換套件、Selenium）
-- ✅ 安裝 mcpvault MCP Server（讓 Claude Code 能讀寫筆記）
+- ✅ 安裝 mcpvault MCP Server（讓 OpenCode 能讀寫筆記）
 - ✅ 批次檔案轉換腳本（docx、xlsx、pdf、圖片 → md，輸入 `/資料處理` 即可執行）
 - ✅ 建好三層資料夾結構（資料蒐集 → 資料處理 → 資料庫建置及產出）
-- ✅ 設定好 Claude 的工作規則（CLAUDE.md）
+- ✅ 設定好 OpenCode 的工作規則（CLAUDE.md）
 - ✅ 建好常用的筆記模板
 - ✅ 設定每週自動知識重整排程
 - ✅ 查核意見自動分類（依查核主題、建議事項、查明處理事項、注意事項等）
@@ -45,9 +45,9 @@ tags:
 完成後，你只要做這些事：
 1. **平時**：原始檔案（docx/pdf/圖片）放進 `資料蒐集/`
 2. **轉換**：輸入 `/資料處理` 批次轉換成 MD 並自動分類
-3. **生成調查計畫**：對 Claude 說「請幫我生成一份[主題]調查計畫」，AI 會自動產出調查計畫 + 法規連結 + 調閱清單 + 缺失問卷（MD + WORD）
-4. **生成工作底稿**：對 Claude 說「請幫我根據[主題]生成工作底稿」
-5. **每週日**：Claude 自動幫你整理成知識庫
+3. **生成調查計畫**：對 OpenCode 說「請幫我生成一份[主題]調查計畫」，AI 會自動產出調查計畫 + 法規連結 + 調閱清單 + 缺失問卷（MD + WORD）
+4. **生成工作底稿**：對 OpenCode 說「請幫我根據[主題]生成工作底稿」
+5. **每週日**：OpenCode 自動幫你整理成知識庫
 
 ---
 
@@ -55,17 +55,33 @@ tags:
 
 在使用這個懶人包之前，請確認：
 
-- [ ] Claude Code 桌面版已安裝且能正常使用（Pro 方案以上）
+- [ ] OpenCode 桌面版已安裝且能正常使用（Pro 方案以上）
 - [ ] 電腦有網路連線
 - [ ] Python 3.8 以上已安裝 — 沒裝也沒關係，步驟零會自動安裝
 
 ---
 
-## 請 Claude Code 幫我執行以下步驟
+## 請 OpenCode 幫我執行以下步驟
 
-> ⚠️ 以下內容是給 Claude Code 讀的操作指令。
-> 你只需要把這整份 MD 檔丟給 Claude Code 桌面版的 Code 分頁，它會自動開始執行。
+> ⚠️ 以下內容是給 OpenCode 讀的操作指令。
+> 你只需要把這整份 MD 檔丟給 OpenCode 桌面版的 Code 分頁，它會自動開始執行。
 > 遇到需要你手動操作的地方，它會暫停並告訴你該怎麼做。
+
+### 安裝流程中需要你協助的項目
+
+執行過程中，OpenCode 會在以下節點暫停並請你回答或手動操作：
+
+| 階段 | 步驟 | 需要你做的事 |
+|------|------|-------------|
+| 二 | 步驟二 | 回答你的姓名、職系、單位、職稱、語言偏好等個人資訊 |
+| 三 | 步驟四 | 指定 Vault 存放路徑（或使用預設值） |
+| 三 | 步驟五 | 若 Obsidian 未開啟，會自動幫你開啟，請你選擇「Open folder as vault」 |
+| 四 | 步驟七 | 關閉並重新開啟 OpenCode 桌面版，讓 MCP 設定生效 |
+| 八 | 步驟十二 | 手動設定 Web Clipper 預設存放資料夾為 `資料蒐集/` |
+| 十一 | 步驟十六 | 提供調查主題，讓 AI 為你生成調查計畫及配套文件 |
+| 十二 | 步驟十七 | 批次轉換完成後，確認是否刪除原始檔案 |
+
+以上 7 個節點，OpenCode 會依序引導你完成，不用擔心漏掉。
 
 ---
 
@@ -73,14 +89,14 @@ tags:
 
 ### 步驟一：環境檢查
 
-> 請 Claude 在開始前，先自動確認以下所有項目。
+> 請 OpenCode 在開始前，先自動確認以下所有項目。
 > 如果有任何一項不符合，請先告知使用者問題所在，並引導解決後再繼續。
 > **不要跳過任何一項檢查，不要假設環境正常。**
 
 1. **確認作業系統**：執行系統指令確認是 Windows / macOS / Linux
 2. **確認網路連線正常**
 3. **檢查 Node.js 是否已安裝**：
-   - Windows 重要提醒：Claude Code 桌面版的 bash 環境可能找不到 `node`
+   - Windows 重要提醒：OpenCode 桌面版的 bash 環境可能找不到 `node`
    - 先嘗試 `node --version`
    - 若失敗，嘗試 `export PATH="/c/Program Files/nodejs:$PATH" && node --version`
    - 若仍失敗，代表未安裝，請安裝：
@@ -147,7 +163,7 @@ tags:
 2. 您屬於什麼**職系**？（例如：財稅會計、會計審計、土木工程）
 3. 您所在**單位**是？（例如：審計部、宜蘭縣審計室）
 4. 您的**職稱**是？（例如：審計員、稽察、科長）
-5. 您希望 Claude 用什麼**語言**回答？（預設：繁體中文）
+5. 您希望 OpenCode 用什麼**語言**回答？（預設：繁體中文）
 6. 您有沒有其他偏好？（例如：回答要專業簡潔、要給我接續提問建議、要用白話文）
 
 > 記下使用者的回答（姓名、職系、單位、職稱等），後續步驟會用到。
@@ -186,30 +202,37 @@ tags:
 │   └── 分析報告/                 ← 綜合分析報告（無特定格式）
 ├── 工作日誌/                     ← 每日工作紀錄與週報
 ├── Templates/                    ← 筆記模板
-└── CLAUDE.md                     ← Claude 的班規（後續步驟建立）
+└── CLAUDE.md                     ← OpenCode 的班規（後續步驟建立）
 ```           ← 模板：各種筆記的固定格式
-└── CLAUDE.md            ← Claude 的班規（後續步驟建立）
+└── CLAUDE.md            ← OpenCode 的班規（後續步驟建立）
 ```
 
 建立完成後，記錄 vault 的完整路徑（後續步驟會用到）。
 
 ### 步驟五：用 Obsidian 開啟 Vault
 
-> 🖐️ **需要手動操作**：
-> 1. 請使用者開啟 Obsidian
-> 2. 選擇「Open folder as vault」（開啟資料夾作為筆記庫）
-> 3. 選擇剛才建立的 vault 資料夾
-> 4. Obsidian 會開啟並顯示空的筆記庫
+> ⚙️ **自動偵測與開啟**：
+> 1. 先偵測使用者是否已連線 Obsidian（檢查 Obsidian 行程是否在背景執行）
+> 2. 若 Obsidian 已在執行中，直接跳到步驟六
+> 3. 若 Obsidian 未執行，自動執行以下路徑開啟 Obsidian：
+>    - Windows：`Start-Process "$env:LOCALAPPDATA\Obsidian\Obsidian.exe"`
+>    - macOS：`open /Applications/Obsidian.app`
+>    - Linux：`obsidian &`
+> 4. 開啟後，告知使用者：
+>    - 「已為您自動開啟 Obsidian」
+>    - 「請選擇「Open folder as vault」（開啟資料夾作為筆記庫）」
+>    - 「選擇剛才建立的 vault 資料夾」
+>    - 或告知使用者：「若尚未建立 vault，請點選「Create new vault」→ 「選擇資料夾」指定剛才建立的目錄結構」
 
-確認使用者已成功開啟 vault 後，繼續下一步。
+確認使用者已成功開啟 vault（可選擇已建立的 vault 路徑）後，繼續下一步。
 
 ---
 
-## 階段四：連接 MCP（讓 Claude Code 能讀寫筆記）
+## 階段四：連接 MCP（讓 OpenCode 能讀寫筆記）
 
 ### 步驟六：安裝 mcpvault MCP Server
 
-mcpvault 讓 Claude Code 能搜尋、讀取、編輯你的筆記。
+mcpvault 讓 OpenCode 能搜尋、讀取、編輯你的筆記。
 **不需要 Obsidian 開著就能運作。不需要在 Obsidian 中安裝任何外掛。**
 
 > 📝 **關於 mcpvault**：mcpvault 是一個輕量的 MCP 伺服器，可以直接讀寫 Obsidian vault 資料夾中的檔案，不需要透過 Obsidian 應用程式本身。
@@ -232,8 +255,8 @@ npm install -g @bitbonsai/mcpvault
 
 #### 6-2：寫入 MCP 設定檔
 
-> ⚠️ **重要**：為了確保 Claude Code 能正確載入 MCP，請在**三個位置**都寫入設定。
-> 這是因為不同版本的 Claude Code（桌面版、CLI、Web）讀取設定的位置不同。
+> ⚠️ **重要**：為了確保 OpenCode 能正確載入 MCP，請在**三個位置**都寫入設定。
+> 這是因為不同版本的 OpenCode（桌面版、CLI、Web）讀取設定的位置不同。
 
 **位置 1：使用者全域設定** `~/.claude/settings.json`
 **位置 2：專案設定** `[工作目錄]/.claude/settings.local.json`
@@ -271,9 +294,9 @@ npm install -g @bitbonsai/mcpvault
 > ⚠️ 路徑中如果有中文或空格，在 JSON 中用雙反斜線跳脫。
 > 例如：`"D:\\我的Vault\\secondbrain"`
 
-### 步驟七：重啟 Claude Code 並驗證
+### 步驟七：重啟 OpenCode 並驗證
 
-> 🖐️ **需要手動操作**：請使用者完全關閉 Claude Code 桌面版，然後重新開啟。
+> 🖐️ **需要手動操作**：請使用者完全關閉 OpenCode 桌面版，然後重新開啟。
 
 重新開啟後，驗證 MCP 是否成功載入：
 - 檢查工具清單中是否有 `mcp__obsidian__` 開頭的工具
@@ -282,8 +305,8 @@ npm install -g @bitbonsai/mcpvault
 如果 MCP 未成功載入，依序排查：
 1. 確認 `~/.claude/settings.json` 中的 `command` 路徑是否正確
 2. 確認 vault 路徑確實存在且可存取
-3. 確認 `.mcp.json` 在 Claude Code 開啟的工作目錄下
-4. 再次重啟 Claude Code
+3. 確認 `.mcp.json` 在 OpenCode 開啟的工作目錄下
+4. 再次重啟 OpenCode
 
 ---
 
@@ -291,7 +314,7 @@ npm install -g @bitbonsai/mcpvault
 
 ### 步驟八：在 vault 根目錄建立 CLAUDE.md
 
-這是 Claude 每次開對話時都會自動讀取的「班規」。
+這是 OpenCode 每次開對話時都會自動讀取的「班規」。
 請根據步驟二使用者的回答，建立以下內容：
 
 ```markdown
@@ -834,7 +857,7 @@ type: log
 
 ### 步驟十三：建立自動排程
 
-使用 Claude Code 的排程功能，建立一個每週日自動執行的知識重整任務。
+使用 OpenCode 的排程功能，建立一個每週日自動執行的知識重整任務。
 
 請建立以下 scheduled task：
 
@@ -881,7 +904,7 @@ type: log
 ```
 
 > 建立完成後，告知使用者：
-> 「✅ 排程已設定！每週日早上，Claude 會自動幫你做知識重整。」
+> 「✅ 排程已設定！每週日早上，OpenCode 會自動幫你做知識重整。」
 > 「你也可以隨時說『跑一次知識重整』來手動觸發。」
 
 ---
@@ -1036,32 +1059,32 @@ tags:
 
 ## 階段十一：生成調查計畫、相關法規及連結、調閱資料清單、缺失評估問卷
 
-### 步驟十六：告訴 Claude 你的調查主題
+### 步驟十六：告訴 OpenCode 你的調查主題
 
 完成所有設定後，你就可以開始生成調查計畫及相關文件了。以下是標準工作流程：
 
 #### 第一步：提供調查主題與背景
 
-對 Claude 說：
+對 OpenCode 說：
 ```
 請幫我生成一份「[縣市]政府辦理[主題]執行情形調查計畫」，
 這是一個關於[簡述調查重點]的事項，
 相關背景資料放在 資料蒐集/ 及 資料處理/ 中。
 ```
 
-Claude 會：
+OpenCode 會：
 1. 讀取 vault 內相關爬蟲資料及基本資料分析
 2. 依調查計畫生成原則產出調查計畫（含 MD 及 WORD 檔）
 3. 儲存至 `資料庫建置及產出/調查計畫/`
 
 #### 第二步：自動生成三份配套文件
 
-調查計畫生成後，Claude 會自動產出以下三份文件（每份均含 MD 及 WORD 檔）：
+調查計畫生成後，OpenCode 會自動產出以下三份文件（每份均含 MD 及 WORD 檔）：
 
-1. **相關法規及連結** — Claude 會整理相關法規條文全文，並：
+1. **相關法規及連結** — OpenCode 會整理相關法規條文全文，並：
    - 使用 `get_pcode.py` 查詢每部法規的正確 PCode
    - 生成 `https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=XXXX` 格式的網址
-   - **務必驗證**：要求 Claude 以瀏覽器實際開啟確認網址正確
+   - **務必驗證**：要求 OpenCode 以瀏覽器實際開啟確認網址正確
 
 2. **調閱資料清單** — 依調查計畫內容（調查主題、調查對象及範圍、調查重點）分析被調查機關應提供之資料，動態生成清單項目（非固定十二項），含開頭說明、資料清單項目、必要時之表1（抽查案件>1件才列）及表2（涉及財產登錄才列），多機關時分項詳列
 
@@ -1070,13 +1093,13 @@ Claude 會：
 
 #### 第三步：生成工作底稿
 
-當你已有查核事實資料時，對 Claude 說：
+當你已有查核事實資料時，對 OpenCode 說：
 ```
 請幫我根據 [主題] 生成工作底稿，
 相關資料在 資料蒐集/ 及 資料處理/3.查核意見/ 中。
 ```
 
-Claude 會依工作底稿生成規則，產出四階段結構的標準化底稿：
+OpenCode 會依工作底稿生成規則，產出四階段結構的標準化底稿：
 1. **標題**（含查核標的、事實摘要、擬議處理意見呼應）
 2. **依據**（行為時法令全文，不摘要）
 3. **查核事實**（機關主體 + 查核標的 + 執行情形 + 缺失分析）
@@ -1089,7 +1112,7 @@ Claude 會依工作底稿生成規則，產出四階段結構的標準化底稿�
 ### 步驟十七：了解批次轉換流程
 
 當使用者在 `資料蒐集/` 資料夾放置非 MD 檔案（docx、xlsx、pdf、圖片等）時，
-只需輸入 `/資料處理`，Claude 就會自動執行以下流程：
+只需輸入 `/資料處理`，OpenCode 就會自動執行以下流程：
 
 1. **掃描**：僅掃描 `資料蒐集/` 中的原始檔案（docx、xlsx、pdf、png、jpg），**不掃描 vault 內其他目錄**
 2. **轉換**：依格式使用對應工具轉為 MD：
@@ -1252,10 +1275,10 @@ TESSERACT_PATH = r"[tesseract完整路徑]"
 - **選擇性轉換**：可指定單一檔案，說「幫我把 XXX.docx 轉成 md」
 - **查核意見索引檔**：`資料處理/3.查核意見/` 下的 `查核意見總整理(YYMMDD).md` 與 `查核意見明細(YYMMDD).md` 由系統自動維護，每次 `/資料處理` 執行後會自動更新。**請勿手動編輯**此兩份檔案，手動新增查核意見應直接放入新 MD 檔至該目錄，下次執行 `/資料處理` 時會自動納入。
 
-對 Claude Code 說：
+對 OpenCode 說：
 「審計第二大腦設定指南執行失敗了，幫我檢查哪裡出問題。」
 
-Claude 會自動：
+OpenCode 會自動：
 1. 檢查 Node.js 是否正常
 2. 檢查 mcpvault 是否正常運作
 3. 檢查 vault 路徑是否正確
@@ -1268,15 +1291,15 @@ Claude 會自動：
 | 問題 | 解法 |
 |------|------|
 | mcpvault 搜尋不到筆記 | 確認 vault 路徑正確，路徑中有中文或空格需用引號包住 |
-| `npx: command not found` | 確認 Node.js 已安裝，重啟 Claude Code 桌面版 |
+| `npx: command not found` | 確認 Node.js 已安裝，重啟 OpenCode 桌面版 |
 | 重啟後 MCP 工具仍不存在 | 確認設定檔中 `command` 使用**完整路徑**（如 `C:\\Users\\...\\mcpvault.cmd`） |
 | Windows bash 找不到 node | `export PATH="/c/Program Files/nodejs:$PATH"` |
 | 設定檔寫了但沒生效 | 確認在三處都寫入（`~/.claude/settings.json`、`.claude/settings.local.json`、`.mcp.json`） |
 | Obsidian 需要裝外掛嗎？ | **不需要**。mcpvault 直接讀寫 vault 資料夾的檔案，不經過 Obsidian app |
 | pandoc 找不到 | 用完整路徑執行，或加入 PATH 環境變數 |
 | PDF 轉 md 後格式亂掉 | PDF 非結構化格式，pymupdf 僅提取純文字。若需保留表格可用 pandas 輔助 |
-| OCR 辨識率不佳 | 確認圖片解析度夠高，可先試用 Claude Code 的 Vision 功能直接讀圖 |
-| **新檔案加入後如何轉換？** | 直接放進對應資料夾，對 Claude 說「執行轉換腳本」即可 |
+| OCR 辨識率不佳 | 確認圖片解析度夠高，可先試用 OpenCode 的 Vision 功能直接讀圖 |
+| **新檔案加入後如何轉換？** | 直接放進對應資料夾，對 OpenCode 說「執行轉換腳本」即可 |
 | **生成法規連結時 pcode 錯誤怎麼辦？** | 使用 `python get_pcode.py "法規名稱"` 查詢正確 pcode，確認後將網址改為 `https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=XXXX` 格式 |
 | **Selenium 啟動時報錯 ChromeDriver 問題** | 自動下載失敗時，手動至 https://googlechromelabs.github.io/chrome-for-testing/ 下載對應版本，或執行 `pip install --upgrade webdriver-manager` |
 | **全國法規資料庫搜尋不到法規** | 確認法規名稱正確（使用完整名稱如「促進民間參與公共建設法」而非簡稱），若仍搜尋不到可改用手動開啟 https://law.moj.gov.tw 查詢 |
@@ -1299,4 +1322,4 @@ Claude 會自動：
 
 - [mcpvault GitHub](https://github.com/bitbonsai/mcpvault)
 - [Obsidian 官網](https://obsidian.md)
-- [[README|Claude Code 懶人包索引]]
+- [[README|OpenCode 懶人包索引]]

@@ -116,7 +116,7 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 
 ---
 
-### 6. audit-secondbrain — 審計第二大腦（Obsidian + Claude Code 知識管理系統）
+### 6. audit-secondbrain — 審計第二大腦（Obsidian + OpenCode 知識管理系統）
 
 建置審計專屬的 AI 第二大腦，自動批次轉換查核文件、生成調查計畫與工作底稿。
 
@@ -130,7 +130,7 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 
 **如何使用**：在 opencode 中說「第二大腦」「審計第二大腦」「audit-secondbrain」
 
-**完整指南**：`skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`（1286 行，15 階段完整操作步驟，可直接餵給 Claude Code 執行）
+**完整指南**：`skills/audit-secondbrain/審計第二大腦設定指南Obsidian_(安裝及調查計畫與工作底稿生成).md`（1286 行，15 階段完整操作步驟，可直接餵給 OpenCode 執行）
 
 **開工收工初始化**：`skills/audit-secondbrain/審計第二大腦開工收工初始化技能.md` — 每日開工/收工自動同步 Obsidian 第二知識大腦，含 Git 自動提交、OCR 轉換、MCP Vault 批次查詢與筆記索引更新
 
