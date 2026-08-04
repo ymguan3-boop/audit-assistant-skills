@@ -17,6 +17,20 @@
 | 📡 | gov-intelligence | 政府地方情資分析（每日主動巡查行政區域重要資訊，分析事件發展，辨識風險） |
 | 📰 | audit-info-publish | 重要政府審計資訊撰寫（分析主題資料、搜尋官網類似案例、依格式撰寫發布稿） |
 | ⚖️ | audit-judgment-draft | 採購申訴審議判斷書簽文撰寫（OCR判斷書PDF、自動產出審計機關簽辦公文） |
+| 💾 | opencode-backup | opencode 設定（含 MCP 伺服器）GitHub 備份 |
+
+---
+
+## 技能分類
+
+| 分類 | 技能 |
+|------|------|
+| 政府採購/標案 | pccsearch、pcic-export、ezbid-bidders |
+| 司法/判決 | fjudsearch |
+| 不動產/地政 | lvrlandmoigov、qgisskill |
+| 審計作業 | audit-secondbrain、audit-report-builder、audit-judgment-draft、audit-info-publish |
+| 情報分析 | gov-intelligence |
+| 其他技能 | opencode-backup |
 
 ---
 
@@ -252,6 +266,24 @@ python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --
 
 ---
 
+### 12. opencode-backup — opencode 設定（含 MCP 伺服器）GitHub 備份
+
+備份本機 opencode 設定（`opencode.json` / `opencode.jsonc`，含 MCP 伺服器清單與環境變數）至 GitHub 儲存庫，作為設定檔版本控制與跨機還原之用。
+
+| 功能 | 說明 |
+|------|------|
+| 設定備份 | 複製 `opencode.json` / `opencode.jsonc` 至 `config-backup/` |
+| 備份清單 | 產生 `manifest.json`（時間戳、MCP 伺服器名稱、各檔案 SHA256） |
+| 安全檢查 | push 前掃描 API Key / Token / 密碼，機敏值以 `<REDACTED>` 取代 |
+| 版本控制 | Git 提交與推送，歷史版本可回溯 |
+| 跨機還原 | 從 GitHub clone 回本機即可還原整份設定 |
+
+**如何使用**：在 opencode 中說「備份設定」「備份 MCP」「備份到 GitHub」「opencode-backup」
+
+**目標儲存庫**：`ymguan3-boop/audit-assistant-skills`，備份檔存放於 `config-backup/` 目錄
+
+---
+
 ## 補充說明：為何 pccsearch 與 ezbid-bidders 不需登入即可爬取資料？
 
 這兩個技能**繞過**了政府官方網站的反爬機制，但並非透過破解登入，而是利用第三方平台早已公開的彙整資料。以下詳細說明其原理與使用情境。
@@ -388,7 +420,8 @@ fetch_bidders.py 執行
     "audit-report-builder": "allow",
     "gov-intelligence": "allow",
     "audit-info-publish": "allow",
-    "audit-judgment-draft": "allow"
+    "audit-judgment-draft": "allow",
+    "opencode-backup": "allow"
   }
 }
 ```
