@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<!--
+  手機端遙控頁 — QR Code 手機遙控簡報
+  複製至簡報部署根目錄旁（與主簡報同一域名）。
+  使用前請替換底部的 ABLY_KEY 為你自己的金鑰。
+-->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>📱 簡報遙控器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #0a0c1c 0%, #111433 50%, #0a1628 100%);
+    color: #e0e0e0; min-height: 100vh; padding: 16px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .header { text-align:center; margin-bottom:16px; }
+  .header h1 { font-size:1.3em; color:#4FC3F7; }
+  .header .room { font-size:0.75em; color:#888; margin-top:4px; }
+  .status { font-size:0.7em; color:#888; margin-bottom:12px; }
+  .status.connected { color:#00C864; }
+  .status.disconnected { color:#FF9100; }
+
+  .nav-controls {
+    display: flex; gap: 12px; margin-bottom: 20px; width: 100%; max-width: 360px;
+  }
+  .nav-btn {
+    flex: 1; padding: 16px 0; border: none; border-radius: 12px;
+    font-size: 1.2em; font-weight: 700; cursor: pointer;
+    transition: all 0.15s; -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn:active { transform: scale(0.95); }
+  .nav-btn.prev { background: rgba(255,145,0,0.8); color:#fff; }
+  .nav-btn.next { background: rgba(0,150,80,0.8); color:#fff; }
+
+  .page-indicator {
+    font-size: 1em; color: #FF9100;
+    margin-bottom: 16px; font-weight: 600;
+  }
+
+  .slide-list {
+    width: 100%; max-width: 360px; flex: 1; overflow-y: auto;
+  }
+  .slide-item {
+    padding: 12px 16px; margin-bottom: 6px; border-radius: 10px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer; transition: all 0.15s; font-size: 0.9em;
+    display: flex; align-items: center; gap: 10px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .slide-item:active { background: rgba(0,96,192,0.3); transform: scale(0.98); }
+  .slide-item.active {
+    background: rgba(0,96,192,0.35); border-color: rgba(79,195,247,0.5);
+    box-shadow: 0 0 12px rgba(0,96,192,0.3);
+  }
+  .slide-item .num {
+    min-width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(0,96,192,0.4); color: #4FC3F7;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8em; font-weight: 700;
+  }
+  .slide-item.active .num { background: #0060C0; color: #fff; }
+
+  .hint { font-size:0.65em; color:#666; margin-top:12px; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📱 簡報遙控器</h1>
+  <div class="room" id="roomLabel">Loading...</div>
+</div>
+<div class="status" id="status">連線中...</div>
+<div class="page-indicator" id="pageIndicator">- / -</div>
+
+<div class="nav-controls">
+  <button class="nav-btn prev" onclick="go(-1)">◀ 上一頁</button>
+  <button class="nav-btn next" onclick="go(1)">▶ 下一頁</button>
+</div>
+
+<div class="slide-list" id="slideList"></div>
+<div class="hint">點擊頁面名稱可直接跳頁</div>
+
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+<script>
+  // ⚠️ 請替換為你自己的 Ably API Key（與主控端 host-embed.html 一致）
+  const ABLY_KEY = 'PASTE_YOUR_ABLY_KEY';
+
+  const params = new URLSearchParams(location.search);
+  const roomId = params.get('room') || 'unknown';
+  const total = parseInt(params.get('total')) || 14;
+  const slideNames = (params.get('slides') || '').split(',').map(s => decodeURIComponent(s.trim()));
+
+  document.getElementById('roomLabel').textContent = 'Room: ' + roomId;
+
+  let channel = null;
+  let currentSlide = 0;
+  let hostOnline = false;
+  let idleTimer = null;
+  const IDLE_LIMIT = 10 * 60 * 1000;
+
+  function updateUI() {
+    document.getElementById('pageIndicator').textContent = (currentSlide + 1) + ' / ' + total;
+    document.querySelectorAll('.slide-item').forEach((el, i) => {
+      el.classList.toggle('active', i === currentSlide);
+    });
+  }
+
+  // 閒置逾時自動斷線
+  function resetIdle() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(autoDisconnect, IDLE_LIMIT);
+  }
+  function autoDisconnect() {
+    setStatus('⏱ 閒置逾 10 分鐘，已自動斷線', 'disconnected');
+    try { channel.presence.leave(); } catch (e) {}
+    try { client.close(); } catch (e) {}
+  }
+
+  // 簡報（主持人端）離線時，手機自動斷線
+  function setHostOnline(on) {
+    hostOnline = on;
+    if (!on) {
+      setStatus('✖ 簡報已關閉，已斷線', 'disconnected');
+      try { channel.presence.leave(); } catch (e) {}
+      try { client.close(); } catch (e) {}
+    }
+  }
+
+  // Render slide list
+  const list = document.getElementById('slideList');
+  for (let i = 0; i < total; i++) {
+    const name = slideNames[i] || ('第 ' + (i + 1) + ' 頁');
+    const div = document.createElement('div');
+    div.className = 'slide-item';
+    div.innerHTML = '<div class="num">' + (i + 1) + '</div><div>' + name + '</div>';
+    div.onclick = () => navTo(i);
+    list.appendChild(div);
+  }
+
+  function navTo(h) {
+    if (h < 0 || h >= total || !channel) return;
+    channel.publish('nav', { h: h });
+    currentSlide = h;
+    updateUI();
+    resetIdle();
+  }
+
+  function go(delta) {
+    navTo(currentSlide + delta);
+  }
+
+  // Ably connection
+  let client;
+  try {
+    client = new Ably.Realtime({ key: ABLY_KEY, clientId: 'mobile-' + Date.now() });
+    channel = client.channels.get('slide-remote-' + roomId);
+
+    // Listen for current slide updates from host
+    channel.subscribe('sync', msg => {
+      if (typeof msg.data.h === 'number') {
+        currentSlide = msg.data.h;
+        updateUI();
+        resetIdle();
+      }
+    });
+
+    // 監控簡報（主持人）端 presence
+    channel.presence.subscribe('enter', m => {
+      if (m.clientId && m.clientId.indexOf('host-') === 0) { setHostOnline(true); resetIdle(); }
+    });
+    channel.presence.subscribe('leave', m => {
+      if (m.clientId && m.clientId.indexOf('host-') === 0) setHostOnline(false);
+    });
+
+    function setStatus(text, cls) {
+      const el = document.getElementById('status');
+      el.textContent = text;
+      el.className = 'status' + (cls ? ' ' + cls : '');
+    }
+
+    client.connection.on('connected', () => {
+      setStatus('✅ 已連線', 'connected');
+      try { channel.presence.enter(); } catch (e) {}
+      resetIdle();
+      // 連線後檢查簡報（主持人）是否在線
+      channel.presence.get((err, members) => {
+        if (err) return;
+        const hosts = members.filter(x => x.clientId && x.clientId.indexOf('host-') === 0);
+        setHostOnline(hosts.length > 0);
+      });
+    });
+    client.connection.on('connecting', () => {
+      setStatus('⏳ 連線中...');
+    });
+    client.connection.on('disconnected', () => {
+      setStatus('⚠️ 連線中斷，重連中...', 'disconnected');
+    });
+    client.connection.on('suspended', () => {
+      setStatus('⛔ 連線已暫停', 'disconnected');
+    });
+    client.connection.on('closed', () => {
+      setStatus('✖ 連線已關閉', 'disconnected');
+    });
+    client.connection.on('failed', () => {
+      setStatus('❌ 連線失敗', 'disconnected');
+    });
+    resetIdle();
+  } catch (e) {
+    document.getElementById('status').textContent = '❌ ' + e.message;
+  }
+
+  updateUI();
+</script>
+</body>
+</html>

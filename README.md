@@ -17,7 +17,8 @@
 | 📡 | gov-intelligence | 政府地方情資分析（每日主動巡查行政區域重要資訊，分析事件發展，辨識風險） |
 | 📰 | audit-info-publish | 重要政府審計資訊撰寫（分析主題資料、搜尋官網類似案例、依格式撰寫發布稿） |
 | ⚖️ | audit-judgment-draft | 採購申訴審議判斷書簽文撰寫（OCR判斷書PDF、自動產出審計機關簽辦公文） |
-| 💾 | opencode-backup | opencode 設定（含 MCP 伺服器）GitHub 備份 |
+| 📱 | slides-qr-remote | **其他技能** — 為 HTML 簡報加入 QR Code 手機遙控功能（掃碼即用手機控制投影片） |
+| 💾 | opencode-backup | **其他技能** — opencode 設定（含 MCP 伺服器）GitHub 備份 |
 
 ---
 
@@ -30,7 +31,7 @@
 | 不動產/地政 | lvrlandmoigov、qgisskill |
 | 審計作業 | audit-secondbrain、audit-report-builder、audit-judgment-draft、audit-info-publish |
 | 情報分析 | gov-intelligence |
-| 其他技能 | opencode-backup |
+| 其他技能 | slides-qr-remote、opencode-backup |
 
 ---
 
@@ -266,7 +267,34 @@ python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --
 
 ---
 
-### 12. opencode-backup — opencode 設定（含 MCP 伺服器）GitHub 備份
+## 其他技能
+
+### 12. slides-qr-remote — HTML 簡報 QR Code 手機遙控功能
+
+為既有 HTML 簡報（Reveal.js / Slidev / 純 HTML 皆可）加入「手機掃碼遙控」功能：主秀左上角顯示 QR Code，聽眾用手機掃碼即可上一頁/下一頁/直接跳頁。
+
+| 功能 | 說明 |
+|------|------|
+| QR Code 生成 | 主秀載入即繪製 QR Code（純黑、150px、高容錯），內容為手機遙控頁網址（含 room、頁數、頁名） |
+| 即時控制 | 手機發布跳頁指令，主秀經 Ably Realtime 即時翻頁；主秀翻頁同步回手機端 |
+| 防火牆穿透 | Ably 走 WSS:443，會議場所/機關內網不需開埠即可連線 |
+| 連線狀態燈 | 主秀左下角顯示「📱 手機已連線/未連線」；10 秒定時檢查手機在線 |
+| 自動斷線 | 主秀關閉時手機立即斷線；任一端閒置逾 10 分鐘自動斷線 |
+| 全螢幕 | 內建全螢幕投放按鈕（支援 webkit/ms 前綴） |
+
+**如何使用**：在 opencode 中說「加入QR Code 手機遙控功能」「QR 手機遙控」「slides-qr-remote」
+
+**檔案**：
+- `host-embed.html` — 主控端嵌入片段（CSS + HTML + 完整 JS，含調整註解）
+- `mobile.html` — 手機端遙控頁完整範本（複製至部署根目錄）
+
+**技術細節**：qrcodejs（jsdelivr）+ Ably 官方 CDN（cdn.ably.com，勿用 jsdelivr 的 ably 路徑會 404）；頻道 `slide-remote-<roomId>`；presence clientId 慣例主控端 `host-` / 手機端 `mobile-`
+
+**備註**：無需安裝套件，CDN 執行期載入。**Ably API Key** 需於 `host-embed.html` 與 `mobile.html` 中自行設定（預設欄位 `PASTE_YOUR_ABLY_KEY`）。
+
+---
+
+### 13. opencode-backup — opencode 設定（含 MCP 伺服器）GitHub 備份
 
 備份本機 opencode 設定（`opencode.json` / `opencode.jsonc`，含 MCP 伺服器清單與環境變數）至 GitHub 儲存庫，作為設定檔版本控制與跨機還原之用。
 
@@ -421,6 +449,7 @@ fetch_bidders.py 執行
     "gov-intelligence": "allow",
     "audit-info-publish": "allow",
     "audit-judgment-draft": "allow",
+    "slides-qr-remote": "allow",
     "opencode-backup": "allow"
   }
 }

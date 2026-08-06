@@ -1,0 +1,200 @@
+<!-- ============================================================
+  主控端嵌入片段 — QR Code 手機遙控簡報
+  來源：road-audit-ai 專案實際套用版（Reveal.js）
+  請依自身簡報框架調整跳頁 API 與結束頁索引。
+  ============================================================ -->
+
+<!-- ① CDN 載入（放在 <head> 或 <body> 頂部皆可） -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+
+<style>
+  /* ② QR Code 卡（左上角、置頂層） */
+  .qr-corner {
+    position: absolute; top: 10px; left: 10px; z-index: 9999;
+    background: rgba(10,12,28,0.92); border: 1px solid rgba(79,195,247,0.4);
+    border-radius: 12px; padding: 10px 12px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    max-width: 180px;
+  }
+  .qr-corner .qr-corner-label { font-size: 0.72em; color: #4FC3F7; font-weight: 700; margin-bottom: 6px; }
+  .qr-corner #qr-corner-canvas { margin: 0 auto; background: #fff; border-radius: 6px; padding: 4px; display: inline-block; }
+  .qr-corner .qr-corner-rules {
+    font-size: 0.62em; color: #aaa; text-align: left; margin-top: 8px;
+    line-height: 1.5; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 6px;
+  }
+
+  /* ③ 主控端手機連線狀態燈（左下角） */
+  #host-conn-status {
+    position: fixed; bottom: 14px; left: 14px; z-index: 1000;
+    background: rgba(60,60,70,0.85); color: #ccc;
+    padding: 6px 14px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,0.15);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  #host-conn-status.on { background: rgba(0,150,80,0.9); color: #fff; border-color: rgba(0,200,100,0.5); box-shadow: 0 0 12px rgba(0,200,100,0.4); }
+
+  /* ④ 全螢幕按鈕 */
+  .fs-btn {
+    background: rgba(0,96,192,0.85); color: #fff;
+    padding: 8px 14px; border-radius: 22px;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border: 2px solid rgba(79,195,247,0.4);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 12px rgba(0,96,192,0.3);
+    transition: all 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    font-family: inherit;
+  }
+  .fs-btn:hover { background: #0060C0; transform: translateY(-2px); }
+</style>
+
+<!-- ⑤ QR Code 卡 HTML（放結束頁的 <section> 內） -->
+<section>
+  <div class="qr-corner" id="qr-corner">
+    <div class="qr-corner-label">📱 手機掃碼遙控簡報</div>
+    <div id="qr-corner-canvas"></div>
+    <div class="qr-corner-rules">
+      連線規則：<br>
+      • 簡報關閉即自動斷線<br>
+      • 任一端閒置逾 10 分鐘自動斷線
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ 狀態燈與全螢幕按鈕（放 <body> 收尾處） -->
+<div id="host-conn-status">📱 手機未連線</div>
+<button class="fs-btn" onclick="toggleFullscreen()" title="投放至全螢幕">⛶ 全螢幕</button>
+
+<script>
+  // ============================================================
+  // ⑦ QR Code 遙控核心 JS
+  // ============================================================
+  // 設定區 ─ 請依實際簡報調整 ↓↓↓
+  const PREVIEW_NAME = 'my-deck';          // 簡報別名（供 roomId 前綴）
+  const PREVIEW_DEPLOY_BASE = null;        // 部署網址，如 'https://<user>.github.io/<repo>/'
+  const PREVIEW_SLIDE_NAMES = [];          // 各頁名稱（手機端顯示），例如 ['封面','前言',...]
+  const PREVIEW_END_INDEXH = null;         // 結束頁索引（0-based），null 則停用「到結束頁才顯示 QR」之限制
+  // 設定區 ↑↑↑
+
+  // 統一跳頁函式 ─ 依框架調整
+  function gotoSlide(h) {
+    if (typeof Reveal !== 'undefined') { Reveal.slide(h); return; }
+    // Slidev: nav.go(h)；自訂框架請自行接入
+  }
+
+  const roomId = PREVIEW_NAME + '-' + Math.random().toString(36).slice(2, 8);
+  window.__roomId = roomId; // 供除錯/測試
+  let ablyChannel = null;
+  let ablyClient = null;
+
+  function setConnStatus(on) {
+    const el = document.getElementById('host-conn-status');
+    if (!el) return;
+    el.textContent = on ? '📱 手機已連線' : '📱 手機未連線';
+    el.classList.toggle('on', !!on);
+  }
+
+  function initAblyRemote() {
+    try {
+      ablyClient = new Ably.Realtime({ key: 'PASTE_YOUR_ABLY_KEY', clientId: 'host-' + Date.now() });
+      ablyChannel = ablyClient.channels.get('slide-remote-' + roomId);
+      ablyChannel.subscribe('nav', msg => {
+        const { h } = msg.data;
+        const total = (typeof Reveal !== 'undefined') ? Reveal.getTotalSlides() : PREVIEW_SLIDE_NAMES.length;
+        if (typeof h === 'number' && h >= 0 && h < total) gotoSlide(h);
+      });
+      // 手機端 presence：進入/離開即更新連線指示燈
+      ablyChannel.presence.subscribe('enter', m => {
+        if (m.clientId && m.clientId.indexOf('mobile-') === 0) setConnStatus(true);
+      });
+      ablyChannel.presence.subscribe('leave', m => {
+        if (m.clientId && m.clientId.indexOf('mobile-') === 0) setConnStatus(false);
+      });
+      ablyClient.connection.on('connected', () => {
+        ablyChannel.presence.enter();
+        checkMobilePresence();
+        // 定時檢查手機是否仍在線（彌補 presence leave 延遲）
+        if (window.__presenceTimer) clearInterval(window.__presenceTimer);
+        window.__presenceTimer = setInterval(checkMobilePresence, 10000);
+      });
+      // 主簡報閒置逾時自動斷線（10 分鐘）
+      let hostIdleTimer = null;
+      function resetHostIdle() {
+        if (hostIdleTimer) clearTimeout(hostIdleTimer);
+        hostIdleTimer = setTimeout(() => {
+          setConnStatus(false);
+          try { ablyChannel.presence.leave(); } catch (e) {}
+          try { ablyClient.close(); } catch (e) {}
+        }, 10 * 60 * 1000);
+      }
+      ablyChannel.subscribe('nav', () => resetHostIdle());
+      resetHostIdle();
+      // 簡報頁面關閉時，主動離開 presence，讓手機立即偵測斷線
+      window.addEventListener('pagehide', () => {
+        try { ablyChannel.presence.leave(); } catch (e) {}
+        try { ablyClient.close(); } catch (e) {}
+      });
+    } catch (e) {
+      console.warn('Ably init failed:', e);
+    }
+  }
+
+  function checkMobilePresence() {
+    if (!ablyChannel) return;
+    ablyChannel.presence.get((err, members) => {
+      if (err) return;
+      const mob = members.filter(x => x.clientId && x.clientId.indexOf('mobile-') === 0);
+      setConnStatus(mob.length > 0);
+    });
+  }
+
+  function renderQRCode() {
+    const qrEl = document.getElementById('qr-corner-canvas');
+    if (!qrEl || qrEl.dataset.rendered) return;
+    // GitHub Pages 部署位址（QR 掃描用手機必定連到這個網址）
+    const DEPLOY_BASE = PREVIEW_DEPLOY_BASE || (location.origin !== 'null' ? location.origin + location.pathname.replace(/[^/]*$/, '') : 'https://<user>.github.io/<repo>/');
+    const total = (typeof Reveal !== 'undefined') ? Reveal.getTotalSlides() : PREVIEW_SLIDE_NAMES.length;
+    const url = new URL('mobile.html', DEPLOY_BASE);
+    url.searchParams.set('room', roomId);
+    url.searchParams.set('total', String(total));
+    if (PREVIEW_SLIDE_NAMES.length) url.searchParams.set('slides', PREVIEW_SLIDE_NAMES.map(encodeURIComponent).join(','));
+    try {
+      new QRCode(qrEl, { text: url.href, width: 150, height: 150, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+      qrEl.dataset.rendered = '1';
+    } catch (e) {
+      console.warn('QR render failed:', e);
+    }
+  }
+
+  // 頁面載入即產生 QR Code（到達結束頁時保證已就緒）
+  function onReady() { renderQRCode(); }
+  if (typeof Reveal !== 'undefined') {
+    Reveal.on('ready', onReady);
+    Reveal.on('slidechanged', e => {
+      if (PREVIEW_END_INDEXH === null || e.indexh === PREVIEW_END_INDEXH) renderQRCode();
+      // 主簡報翻頁時同步通知手機端
+      if (ablyChannel) ablyChannel.publish('sync', { h: e.indexh });
+    });
+  } else {
+    document.addEventListener('DOMContentLoaded', onReady);
+  }
+
+  // 主簡報啟動時即連線 Ably，監聽手機遙控指令
+  initAblyRemote();
+
+  // 全螢幕切換
+  function toggleFullscreen() {
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!fsEl) {
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+      if (req) {
+        const p = req.call(el);
+        if (p && p.catch) p.catch(() => {});
+      }
+    } else {
+      const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if (ex) { try { ex.call(document); } catch (e) {} }
+    }
+  }
+</script>
