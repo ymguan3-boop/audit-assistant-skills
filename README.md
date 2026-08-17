@@ -17,6 +17,7 @@
 | 📡 | gov-intelligence | 政府地方情資分析（每日主動巡查行政區域重要資訊，分析事件發展，辨識風險） |
 | 📰 | audit-info-publish | 重要政府審計資訊撰寫（分析主題資料、搜尋官網類似案例、依格式撰寫發布稿） |
 | ⚖️ | audit-judgment-draft | 採購申訴審議判斷書簽文撰寫（OCR判斷書PDF、自動產出審計機關簽辦公文） |
+| 🔤 | ocr-scanned-files | **其他技能** — 掃描件批次 OCR 轉換（PaddleOCR，對無文字層之掃描 PDF/圖片批次辨識並產出 Markdown，支援斷點續跑） |
 | 📱 | slides-qr-remote | **其他技能** — 為 HTML 簡報加入 QR Code 手機遙控功能（掃碼即用手機控制投影片） |
 | 💾 | opencode-backup | **其他技能** — opencode 設定（含 MCP 伺服器）GitHub 備份 |
 
@@ -31,7 +32,7 @@
 | 不動產/地政 | lvrlandmoigov、qgisskill |
 | 審計作業 | audit-secondbrain、audit-report-builder、audit-judgment-draft、audit-info-publish |
 | 情報分析 | gov-intelligence |
-| 其他技能 | slides-qr-remote、opencode-backup |
+| 其他技能 | slides-qr-remote、opencode-backup、ocr-scanned-files |
 
 ---
 
@@ -267,9 +268,37 @@ python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --
 
 ---
 
+### 12. ocr-scanned-files — 掃描件批次 OCR 轉換
+
+使用 **PaddleOCR 3.7**（GitHub 星星數最高之開源多語言 OCR，82,109★、Apache-2.0），對「資料處理紀錄.json」中標記為「掃描件」的 PDF/圖片批次執行 OCR，產出含 frontmatter 的 Markdown 檔並更新處理紀錄。
+
+| 功能 | 說明 |
+|------|------|
+| 批次 OCR | 自動掃描處理紀錄中 `status=掃描件` 之 PDF/圖片，逐檔 OCR |
+| 自動歸檔 | 依內容分類歸檔至 `資料處理/1.基本資料分析` 或 `2.法規或函示` |
+| 斷點續跑 | 每檔處理後即時寫入處理紀錄，中斷後重新執行即續跑 |
+| 錯誤容錯 | 單檔失敗不中斷批次，失敗訊息記錄於處理紀錄可重跑 |
+| 後台執行 | 支援 `subprocess.Popen` 完全分離背景執行，適合數百檔長時間批次 |
+| 安全驗證 | 技能內建「確認無病毒」流程（Trend Micro TSC64 掃描／Defender 掃描／可疑檔檢查） |
+
+**如何使用**：在 opencode 中說「批次 OCR」「掃描件轉文字」「OCR 掃描」「ocr-scanned-files」
+
+**命令列**：
+```powershell
+python ocr_scanned_files.py                          # 完整批次 OCR（斷點續跑）
+python ocr_scanned_files.py --project "專案資料夾"    # 指定專案
+python ocr_scanned_files.py --limit 2                # 僅處理前 2 檔（測試）
+```
+
+**技術細節**：PaddleOCR 3.7 + paddlepaddle 3.3；**必須 `enable_mkldnn=False`**（避免 CPU oneDNN 推理報 `ConvertPirAttribute2RuntimeAttribute not support` 錯誤）；使用 PP-OCRv5 mobile 模型（每檔約 1~4 分鐘）；手寫簽名辨識度有限需人工校對
+
+**依賴**：Python 3.10+、paddlepaddle、paddleocr 3.7+、`convert_all_to_md.py`（歸檔常數）
+
+---
+
 ## 其他技能
 
-### 12. slides-qr-remote — HTML 簡報 QR Code 手機遙控功能
+### 13. slides-qr-remote — HTML 簡報 QR Code 手機遙控功能
 
 為既有 HTML 簡報（Reveal.js / Slidev / 純 HTML 皆可）加入「手機掃碼遙控」功能：主秀左上角顯示 QR Code，聽眾用手機掃碼即可上一頁/下一頁/直接跳頁。
 
@@ -294,7 +323,7 @@ python build_report.py --plan "調查計畫.docx" --workpapers "底稿1.docx" --
 
 ---
 
-### 13. opencode-backup — opencode 設定（含 MCP 伺服器）GitHub 備份
+### 14. opencode-backup — opencode 設定（含 MCP 伺服器）GitHub 備份
 
 備份本機 opencode 設定（`opencode.json` / `opencode.jsonc`，含 MCP 伺服器清單與環境變數）至 GitHub 儲存庫，作為設定檔版本控制與跨機還原之用。
 
@@ -449,6 +478,7 @@ fetch_bidders.py 執行
     "gov-intelligence": "allow",
     "audit-info-publish": "allow",
     "audit-judgment-draft": "allow",
+    "ocr-scanned-files": "allow",
     "slides-qr-remote": "allow",
     "opencode-backup": "allow"
   }
