@@ -63,6 +63,55 @@ playwright_browser_navigate "https://bid.twincn.com/lm.aspx?q={URL編碼後的�
 - 得標/未得標都要看 — 未得標案件同樣是投標行為紀錄
 - 廠商如有更名，舊名稱也要查
 
+---
+
+# 投標廠商資料抓取（ezbid.tw）
+
+## 功能說明
+從 ezbid.tw 抓取各標案的投標廠商列表，並存入資料庫。
+
+## 使用方式
+
+### 方法一：使用 Playwright 抓取
+
+```python
+# 導入腳本
+from fetch_bidders_from_ezbid import fetch_tender_bidders_from_ezbid
+
+# 抓取特定標案的投標廠商
+bidders = fetch_tender_bidders_from_ezbid(page, agency_code="3.76.42.54", tender_id="TA1080521")
+```
+
+### 方法二：執行批次抓取腳本
+
+```bash
+python fetch_bidders_from_ezbid.py
+```
+
+腳本會：
+1. 從資料庫取得所有宜蘭縣標案
+2. 逐一從 ezbid.tw 抓取投標廠商列表
+3. 將資料存入 `投標廠商` 資料表
+
+## 資料庫欄位
+
+投標廠商資料表欄位：
+| 欄位名稱 | 說明 |
+|---------|------|
+| 標案案號 | 標案編號 |
+| 機關代碼 | 機關統一編碼 |
+| 機關名稱 | 機關名稱 |
+| 標案名稱 | 標案名稱 |
+| 廠商名稱 | 投標廠商名稱 |
+| 是否得標 | 是/否 |
+| 投標金額 | 投標金額 |
+| 價差 | 與底價或預算價差 |
+
+## 注意事項
+- ezbid.tw 資料來源為政府電子採購網，資料完整度較高
+- 建議使用 Playwright 而非 requests，因頁面需要 JavaScript 渲染
+- 每次請求間隔 1 秒，避免過度請求
+
 ## 應用範例
 ```
 # 查詢廠商所有標案

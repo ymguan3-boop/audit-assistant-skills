@@ -79,6 +79,9 @@ def main() -> None:
     if args.limit:
         pdfs = pdfs[: args.limit]
 
+    if not args.no_priority:
+        pdfs = sorted(pdfs, key=priority_key)
+
     os.environ["FLAGS_use_mkldnn"] = "false"
     from paddleocr import PaddleOCR
 
@@ -148,10 +151,23 @@ def ocr_pdf_to_markdown(ocr, path: Path) -> str:
     return "\n\n---\n\n".join(pages)
 
 
+def priority_key(item: tuple[str, dict]) -> tuple:
+    """排序鍵：小檔優先，日報表大檔排最後。回傳 (優先序, 原路徑)。"""
+    rel, _rec = item
+    if "日報表" in rel or "月日報" in rel:
+        return (1, rel)
+    return (0, rel)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="掃描件批次 OCR")
     parser.add_argument("--project", default=str(DEFAULT_PROJECT))
     parser.add_argument("--limit", type=int, default=None, help="僅處理前 N 個")
+    parser.add_argument(
+        "--no-priority",
+        action="store_true",
+        help="依原始順序處理，不做日報表大檔排後之排序",
+    )
     return parser.parse_args()
 
 
