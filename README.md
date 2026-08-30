@@ -2,8 +2,8 @@
 
 審計輔助用技能倉庫 — 集合 opencode 技能，協助審計人員快速查詢政府採購資料及產出審計文件。
 
-> 更新日期: 2026-08-19
-> 技能總數: 31 個
+> 更新日期: 2026-08-30
+> 技能總數: 32 個
 
 ## 技能總覽
 
@@ -24,6 +24,7 @@
 | 審計專業 | ocr-scanned-files | **其他技能** — 繁體中文掃描 OCR 轉換（PaddleOCR，掃描 PDF/圖片批次辨識並產出 Markdown，支援斷點續跑） |
 | 審計專業 | slides-qr-remote | **其他技能** — 為 HTML 簡報加入 QR Code 手機遙控功能（聽眾以手機控制翻頁） |
 | 審計專業 | opencode-backup | **其他技能** — opencode 設定（含 MCP 伺服器）GitHub 備份 |
+| GIS/3D | gis3d-development-impact | GIS 3D 開發影響評估（免 API Key 公開 GIS 資料建立互動式 3D GIS 模型、生態/交通/水文/都市/環境/碳排分析） |
 | 影片生成 | brand-promo-video-generator | 品牌宣傳影片產生器（資產驗證→品牌真相表→分鏡→生成→交付） |
 | 影片生成 | papercraft-stop-motion-explainer | 紙藝定格動畫解說產生器（紙雕/紙藝風格教育解說影片） |
 | 影片生成 | paper-collage-explainer-generator | 拼貼畫風格解說影片產生器（Vox 風紙拼貼動畫） |
@@ -51,9 +52,10 @@
 |------|------|
 | 政府採購/標案 | pccsearch、pcic-export、ezbid-bidders |
 | 司法/判決 | fjudsearch |
-| 不動產/地政 | lvrlandmoigov、qgisskill |
+| 不動產/地政 | lvrlandmoigov、qgisskill、gis3d-development-impact |
 | 審計作業 | audit-secondbrain、audit-report-builder、audit-judgment-draft、audit-info-publish、final-accounts-audit-opinion |
 | 情資分析 | gov-intelligence |
+| GIS/3D | gis3d-development-impact、qgisskill、3d-builder、blandercustomize |
 | 影片/3D/簡報/遊戲 | 見下方分類說明 |
 | 其他技能 | slides-qr-remote、opencode-backup、ocr-scanned-files、project-init、startup、shutdown |
 
@@ -154,6 +156,25 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 **常用指令**：在 opencode 中說「qgisskill」「QGIS 技能」
 
 **參考檔案**：`town_coords.json`（宜蘭縣12鄉鎮中心點座標）
+
+---
+
+### 5-1. gis3d-development-impact — GIS 3D 開發影響評估
+
+針對臺灣新建大樓、住宅、公共建築、橋梁、道路等公共設施，以免 API Key、免 Token、免付費授權的公開 GIS 資料建立互動式 3D GIS 模型。
+
+| 功能 | 說明 |
+|------|------|
+| 定位選點 | 支援 Google Maps 定位選點或土地地號輸入 |
+| 設計解析 | 解析基本設計 PDF/圖說，自動建構現況 GIS 3D 基礎模型 |
+| 人工核對 | Google Maps 人工核對驗證，驗證通過後才進行現況渲染 |
+| 影響分析 | 生態/交通/水文防災/都市機能/環境/碳排六大模式擇一分析 |
+| 互動網頁 | 產生互動式網頁並匯出 Excel 分析成果 |
+| 公開資料 | 使用免 API Key 公開 GIS 資料，無需付費授權 |
+
+**常用指令**：在 opencode 中說「GIS 3D」「開發影響評估」「gis3d-development-impact」
+
+**輸出**：互動式網頁 + Excel 分析成果 + 多層距離影響評估（250m/500m/2km/5km/10km）
 
 ---
 
@@ -691,6 +712,7 @@ fetch_bidders.py 啟動
     "lvrlandmoigov": "allow",
     "pcic-export": "allow",
     "qgisskill": "allow",
+    "gis3d-development-impact": "allow",
     "audit-secondbrain": "allow",
     "ezbid-bidders": "allow",
     "audit-report-builder": "allow",
