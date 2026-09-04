@@ -15,7 +15,6 @@
 | 審計專業 | pcic-export | 公共工程雲端服務網標案資料匯出（支援 `--yilan` 參數宜蘭縣匯出） |
 | 審計專業 | qgisskill | QGIS 地圖自動化（宜蘭縣地政資料系統） |
 | 審計專業 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
-| 工作底稿生成 | working-paper-builder | 依四階段結構（標題、依據、查核事實、擬議）標準化生成，強調三者呼應及扣點計算 |
 | 審計專業 | ezbid-bidders | ezbid.tw 投標廠商資料抓取（下載各標案投標廠商名單） |
 | 審計專業 | audit-report-builder | 審計報告彙整（以調查計畫及工作底稿自動產出 Word 報告） |
 | 審計專業 | gov-intelligence | 政府地方情資分析（每日主動巡查縣市行政區域重要資訊，分析事件發展） |
