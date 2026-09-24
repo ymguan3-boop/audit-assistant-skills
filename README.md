@@ -2,8 +2,8 @@
 
 審計輔助用技能倉庫 — 集合 opencode 技能，協助審計人員快速查詢政府採購資料及產出審計文件。
 
-> 更新日期: 2026-08-30
-> 技能總數: 32 個
+> 更新日期: 2026-09-24
+> 技能總數: 33 個
 
 ## 技能總覽
 
@@ -25,6 +25,7 @@
 | 審計專業 | slides-qr-remote | **其他技能** — 為 HTML 簡報加入 QR Code 手機遙控功能（聽眾以手機控制翻頁） |
 | 審計專業 | opencode-backup | **其他技能** — opencode 設定（含 MCP 伺服器）GitHub 備份 |
 | GIS/3D | gis3d-development-impact | GIS 3D 開發影響評估（免 API Key 公開 GIS 資料建立互動式 3D GIS 模型、生態/交通/水文/都市/環境/碳排分析） |
+| AI 程式整合 | gemini-live-app-assistant |
 | 影片生成 | brand-promo-video-generator | 品牌宣傳影片產生器（資產驗證→品牌真相表→分鏡→生成→交付） |
 | 影片生成 | papercraft-stop-motion-explainer | 紙藝定格動畫解說產生器（紙雕/紙藝風格教育解說影片） |
 | 影片生成 | paper-collage-explainer-generator | 拼貼畫風格解說影片產生器（Vox 風紙拼貼動畫） |
@@ -39,6 +40,7 @@
 | 簡報 | slides-qr-remote | 簡報 QR Code 手機遙控功能 |
 | 互動遊戲 | qrcode-game-skill | QR Code 互動遊戲系統建置（大螢幕+手機掃碼互動） |
 | 地圖 | qgisskill | QGIS 地圖自動化（安裝、下載資料、設定圖層、載入地址） |
+| AI 程式整合 | gemini-live-app-assistant | Gemini Live 語音、宿主工具與使用者授權畫面整合 |
 | 專案管理 | project-init | 新專案初始化（建立基本結構） |
 | 專案管理 | startup | 開工自動同步（讀取上次進度、恢復工作環境） |
 | 專案管理 | shutdown | 收工自動同步（整理進度、備份成果） |
@@ -573,6 +575,24 @@ python ocr_scanned_files.py --limit 2                # 僅處理前 2 頁（測�
 
 ---
 
+### 32. gemini-live-app-assistant — Gemini Live 程式語音助理整合
+
+將 Gemini Live 即時語音接入網頁程式，讓助理在宿主明確授權下讀取程式狀態／畫面、呼叫已註冊功能並以語音回覆。
+
+| 功能 | 說明 |
+|------|------|
+| Live 語音 | 瀏覽器麥克風、PCM AudioWorklet、Gemini Live WebSocket 與語音回覆 |
+| 宿主工具 | 僅呼叫程式明確註冊且通過參數驗證的功能；高風險操作由宿主再次確認 |
+| 畫面理解 | 預設先讀結構化狀態；畫面影格須由使用者授權並由宿主提供新鮮、適當遮蔽的影像 |
+| 權杖安全 | 後端保管長期 API Key，前端僅取得短效 Live 權杖 |
+| 移植驗收 | 含宿主契約、來源對照、瀏覽器／後端範本與離線測試 |
+
+**技能文件**：[gemini-live-app-assistant README](skills/gemini-live-app-assistant/README.md)  
+**安全界線**：技能不會自動取得其他程式的畫面或操作權；目標程式仍須實作授權、功能登錄、權杖端點及端到端驗收。
+
+---
+
+
 ## 附錄：關於 pccsearch 與 ezbid-bidders 是否需要登入即可查詢資料？
 
 這兩個技能**繞過**了政府網站本身的反爬蟲限制，但並非透過破解登入，而是利用第三方網站已公開的開放資料。以下詳細說明原理與使用情境。
@@ -722,10 +742,22 @@ fetch_bidders.py 啟動
     "final-accounts-audit-opinion": "allow",
     "ocr-scanned-files": "allow",
     "slides-qr-remote": "allow",
-    "opencode-backup": "allow"
+    "opencode-backup": "allow",
+    "gemini-live-app-assistant": "allow"
   }
 }
 ```
+
+### Codex 技能安裝
+
+複製技能資料夾至 Codex 使用者技能目錄：
+
+```powershell
+Copy-Item -Recurse .\skills\gemini-live-app-assistant "$env:USERPROFILE\.codex\skills\gemini-live-app-assistant"
+```
+
+重新開啟或刷新 Codex 後，可在目標程式專案要求使用 `$gemini-live-app-assistant`。安裝技能不代表已授權目標程式存取麥克風、畫面或操作功能；仍須依宿主契約整合並由使用者授權。
+
 
 ## 相關資源
 
