@@ -145,6 +145,10 @@ Hunyuan3D-2 -> GLB/OBJ -> Blender adjust -> public/models -> Three.js runtime
 - Give every interactive object a stable ID and a human-readable label.
 - Add keyboard and pointer/touch equivalents for important interactions.
 
+## 程式建模角色
+
+用程式（不經 GLB）建立或升級角色、吉祥物時，必須先讀 [references/procedural-character-rig.md](references/procedural-character-rig.md)。重點：關節比照專案主角、身體不用方塊、五官貼平並隨動作變化表情、量測地面與世界比例、招式依時間表觸發特效且要有攻擊目標，推送前先用可旋轉的檢視頁給使用者看。
+
 ## Required workflow
 
 1. Inspect the repository, existing scripts, package manager, asset folders and deployment configuration.
