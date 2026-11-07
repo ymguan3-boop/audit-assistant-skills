@@ -2,8 +2,8 @@
 
 審計輔助用技能倉庫 — 集合 opencode 技能，協助審計人員快速查詢政府採購資料及產出審計文件。
 
-> 更新日期: 2026-09-24
-> 技能總數: 33 個
+> 更新日期: 2026-11-07
+> 技能總數: 34 個
 
 ## 技能總覽
 
@@ -34,6 +34,7 @@
 | 影片生成 | music-video-subtitle-generator | MV 字幕產生器（歌詞排版與視覺效果） |
 | 影片生成 | co-op-game-intro-generator | 合作遊戲開場動畫生成器（雙人遊戲選單/開場動畫） |
 | 影片生成 | handdrawn-live-video-generator | 手繪風格實景影片產生器（手繪動畫與實拍融合） |
+| 圖像生成 | gpt-media | 用 Playwright 操作已登入的 ChatGPT 網頁，生成 PNG 與 GIF（批次 GIF、綠幕去背） |
 | 3D 建模 | 3d-builder | 混合建模（Blender 精確建模 + Hunyuan3D-2 AI 生成） |
 | 3D 建模 | blandercustomize | 編輯 opencode 配置與自動化 Blender 建築模型建置 |
 | 簡報 | html-slide-builder | Reveal.js HTML 互動簡報生成器（教材→互動簡報→部署 GitHub Pages） |
@@ -59,6 +60,7 @@
 | 情資分析 | gov-intelligence |
 | GIS/3D | gis3d-development-impact、qgisskill、3d-builder、blandercustomize |
 | 影片/3D/簡報/遊戲 | 見下方分類說明 |
+| 圖像生成 | gpt-media |
 | 其他技能 | slides-qr-remote、opencode-backup、ocr-scanned-files、project-init、startup、shutdown |
 
 ---
@@ -593,6 +595,24 @@ python ocr_scanned_files.py --limit 2                # 僅處理前 2 頁（測�
 ---
 
 
+### 33. gpt-media — 用 GPT 生成 PNG 與 GIF
+
+用 Playwright 連到已登入的 Chrome，在 ChatGPT 網頁生成圖片或 GIF，適合遊戲素材、圖示、頭像與封面。
+
+```bash
+node scripts/gpt-media.mjs chrome
+node scripts/gpt-media.mjs make --out out/hero.gif --prompt "待機眨眼的循環動畫，背景透明" --ref ref/hero.png
+node scripts/gpt-media.mjs gif-batch --list items.json --out-dir out/gifs
+```
+
+- 批次時把 4 張參考圖拼成 2×2，一次產出再切成 4 個。
+- `key-green.mjs` 提供綠幕連通去背與圖示表切割。
+- 不輸入帳號密碼，登入由使用者自己完成；上傳的圖片會傳給 OpenAI。
+
+詳見 [skills/gpt-media/README.md](skills/gpt-media/README.md)。
+
+---
+
 ## 附錄：關於 pccsearch 與 ezbid-bidders 是否需要登入即可查詢資料？
 
 這兩個技能**繞過**了政府網站本身的反爬蟲限制，但並非透過破解登入，而是利用第三方網站已公開的開放資料。以下詳細說明原理與使用情境。
@@ -743,7 +763,8 @@ fetch_bidders.py 啟動
     "ocr-scanned-files": "allow",
     "slides-qr-remote": "allow",
     "opencode-backup": "allow",
-    "gemini-live-app-assistant": "allow"
+    "gemini-live-app-assistant": "allow",
+    "gpt-media": "allow"
   }
 }
 ```
@@ -758,6 +779,16 @@ Copy-Item -Recurse .\skills\gemini-live-app-assistant "$env:USERPROFILE\.codex\s
 
 重新開啟或刷新 Codex 後，可在目標程式專案要求使用 `$gemini-live-app-assistant`。安裝技能不代表已授權目標程式存取麥克風、畫面或操作功能；仍須依宿主契約整合並由使用者授權。
 
+
+### Claude Code 技能安裝
+
+複製技能資料夾至 Claude Code 使用者技能目錄：
+
+```powershell
+Copy-Item -Recurse .\skills\gpt-media "$env:USERPROFILE\.claude\skills\gpt-media"
+```
+
+`gpt-media` 複製後要到 `scripts` 資料夾執行 `npm install`。
 
 ## 相關資源
 

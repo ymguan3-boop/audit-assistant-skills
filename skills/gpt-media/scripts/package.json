@@ -1,0 +1,10 @@
+{
+  "name": "gpt-media",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "用 Playwright 操作已登入的 ChatGPT 網頁生成 PNG 與 GIF",
+  "dependencies": {
+    "playwright-core": "^1.48.0"
+  }
+}
