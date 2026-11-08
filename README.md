@@ -14,7 +14,9 @@
 | 審計專業 | lvrlandmoigov | 內政部不動產實價登錄查詢 |
 | 審計專業 | pcic-export | 公共工程雲端服務網標案資料匯出（支援 `--yilan` 參數宜蘭縣匯出） |
 | 審計專業 | qgisskill | QGIS 地圖自動化（宜蘭縣地政資料系統） |
-| 審計專業 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統 |
+| 審計專業 | audit-secondbrain | 審計第二大腦 Obsidian 知識管理系統（安裝、批次轉換、知識重整） |
+| 審計專業 | audit-investigation-plan | 生成調查計畫（11 章節＋法規連結＋調閱清單＋缺失問卷） |
+| 審計專業 | audit-working-paper | 生成工作底稿／查核意見（四階段結構、金額與罰則取捨檢核） |
 | 審計專業 | ezbid-bidders | ezbid.tw 投標廠商資料抓取（下載各標案投標廠商名單） |
 | 審計專業 | audit-report-builder | 審計報告彙整（以調查計畫及工作底稿自動產出 Word 報告） |
 | 審計專業 | gov-intelligence | 政府地方情資分析（每日主動巡查縣市行政區域重要資訊，分析事件發展） |
@@ -56,7 +58,7 @@
 | 政府採購/標案 | pccsearch、pcic-export、ezbid-bidders |
 | 司法/判決 | fjudsearch |
 | 不動產/地政 | lvrlandmoigov、qgisskill、gis3d-development-impact |
-| 審計作業 | audit-secondbrain、audit-report-builder、audit-judgment-draft、audit-info-publish、final-accounts-audit-opinion |
+| 審計作業 | audit-secondbrain、audit-investigation-plan、audit-working-paper、audit-report-builder、audit-judgment-draft、audit-info-publish、final-accounts-audit-opinion |
 | 情資分析 | gov-intelligence |
 | GIS/3D | gis3d-development-impact、qgisskill、3d-builder、blandercustomize |
 | 影片/3D/簡報/遊戲 | 見下方分類說明 |
@@ -182,23 +184,21 @@ python run_export.py --export-dir DIR # 指定匯出目錄
 
 ---
 
-### 6. audit-secondbrain — 審計第二大腦（Obsidian + OpenCode 知識管理系統）
+### 6. 審計第二大腦三技能（audit-secondbrain／audit-investigation-plan／audit-working-paper）
 
-建構審計專業 AI 第二大腦，自動批次轉換查核資料、生成調查計畫與工作底稿。
+115/11/08 起將原 `audit-secondbrain` 拆分為 3 個技能，各自可獨立載入，避免一次讀入 1,286 行指南：
 
-| 功能 | 說明 |
-|------|------|
-| 批次轉換 | docx/xlsx/pdf/圖片 → markdown，自動分類歸檔 |
-| 調查計畫生成 | 含相關法規連結（自動查 PCode）、調閱資料清單、缺失評估問卷 |
-| 工作底稿生成 | 四階段標準化結構（標題、依據、查核事實、擬議處理意見） |
-| 知識庫整合 | 每週自動依照 Karpathy 疊代、累積知識庫 |
-| 法規查詢 | get_pcode.py 自動查詢法規資料庫 PCode |
+| 技能 | 用途 | 觸發詞 |
+|---|---|---|
+| `audit-secondbrain` | 安裝設定、批次轉換與分類（`/資料處理`）、查核意見四層歸檔、每週知識重整 | 「第二大腦」「知識重整」「/資料處理」 |
+| `audit-investigation-plan` | 調查計畫 11 章節＋相關法規連結＋調閱資料清單＋缺失評估問卷（MD＋WORD） | 「生成調查計畫」 |
+| `audit-working-paper` | 工作底稿／查核意見四階段結構；含金額認定、罰則取捨、無異常摘要及交稿檢核 | 「生成工作底稿」「查核意見」 |
 
-**常用指令**：在 opencode 中說「第二大腦」「審計第二大腦」「audit-secondbrain」
+**安裝指南**：`skills/audit-secondbrain/references/setup-guide.md`（15 個階段完整操作與進階設定）
 
-**完整設定**：`skills/audit-secondbrain/審計第二大腦設定（安裝與調查計畫與工作底稿生成）.md`（1286 行，15 個步驟完整操作與進階設定）
+**工作底稿生成原則**：`docs/working-paper-principle.md`（含 1150826 三者呼應、1151108 金額取捨修訂）
 
-**開工自動同步**：`skills/audit-secondbrain/審計第二大腦開工自動同步技能.md` — 每次開工/收工自動同步 Obsidian 第二大腦資料庫，含 Git 自動備份、OCR 轉換、MCP Vault 檔案查詢與知識庫歸檔機制
+**開工自動同步**：`skills/audit-secondbrain/審計第二大腦開工自動同步技能.md` — 開工／收工自動同步、Git 備份、OCR 轉換、MCP Vault 查詢與知識庫歸檔
 
 ---
 
